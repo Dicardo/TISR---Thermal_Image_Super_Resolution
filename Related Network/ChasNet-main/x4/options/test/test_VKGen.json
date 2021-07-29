@@ -1,0 +1,34 @@
+{
+  "name": "PBVS_Validation_x4_selfasmbl"
+  , "suffix": null
+  , "model": "our"
+  , "scale": 4
+  , "gpu_ids": [0]
+
+  , "datasets": {
+    "test_1": { // the 1st test dataset
+      "name": "Testing_Flir"
+      , "mode": "LRHR"
+      , "dataroot_HR": "/home/sda/dingmoxuan/lab/PMBANet_DSR-master/no_color-guided/data/test_gt"
+      , "dataroot_LR": "/home/sda/dingmoxuan/lab/PMBANet_DSR-master/no_color-guided/data/testx4"
+    }
+  }
+
+  , "path": {
+    "root": "/home/sda/dingmoxuan/lab/ChasNet-main/x4/test/"
+    , "pretrain_model_G": "/home/sda/dingmoxuan/lab/ChasNet-main/x4/199000_G.pth"
+  }
+
+  , "network_G": {
+    "which_model_G": "ourgen" // RRDB_net | sr_resnet
+    , "norm_type": "batch"
+    , "mode": "CNA"
+    , "nf": 128
+    , "nb": 23
+    , "in_nc": 3
+    , "out_nc": 3
+
+    , "gc": 32
+    , "group": 1
+  }
+}
