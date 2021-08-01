@@ -1,0 +1,3100 @@
+21-07-29 21:55:24.718 - INFO:   name: LargeChannels
+  use_tb_logger: True
+  model: our
+  scale: 4
+  gpu_ids: [0]
+  datasets:[
+    train:[
+      name: PBVS21_Train
+      mode: LRHR
+      dataroot_HR: /home/sba/sunzheng/Thermal_UNet/challengedataset/train/640_flir_hr
+      dataroot_LR: /home/sba/sunzheng/Thermal_UNet/challengedataset/train/HR_down2_LR
+      subset_file: None
+      use_shuffle: True
+      n_workers: 8
+      batch_size: 8
+      HR_size: 192
+      use_flip: True
+      use_rot: True
+      phase: train
+      scale: 4
+      data_type: img
+    ]
+    val:[
+      name: PBVS21_Val
+      mode: LRHR
+      dataroot_HR: /home/sba/sunzheng/Thermal_UNet/challengedataset/test/640_flir_hr
+      dataroot_LR: /home/sba/sunzheng/Thermal_UNet/challengedataset/test/HR_down2_LR
+      phase: val
+      scale: 4
+      data_type: img
+    ]
+  ]
+  path:[
+    root: /home/sba/sunzheng/ChasNet_x4/train_down_result/
+    pretrain_model_G: None
+    experiments_root: /home/sba/sunzheng/ChasNet_x4/train_down_result/experiments/LargeChannels
+    models: /home/sba/sunzheng/ChasNet_x4/train_down_result/experiments/LargeChannels/models
+    training_state: /home/sba/sunzheng/ChasNet_x4/train_down_result/experiments/LargeChannels/training_state
+    log: /home/sba/sunzheng/ChasNet_x4/train_down_result/experiments/LargeChannels
+    val_images: /home/sba/sunzheng/ChasNet_x4/train_down_result/experiments/LargeChannels/val_images
+  ]
+  network_G:[
+    which_model_G: ourgen
+    norm_type: batch
+    mode: CNA
+    nf: 128
+    nb: 23
+    in_nc: 3
+    out_nc: 3
+    gc: 32
+    group: 1
+    scale: 4
+  ]
+  train:[
+    lr_G: 0.0002
+    lr_scheme: MultiStepLR
+    lr_steps: [40000, 80000, 120000, 160000]
+    lr_gamma: 0.5
+    pixel_criterion: l1
+    pixel_weight: 1.0
+    val_freq: 1000.0
+    manual_seed: 0
+    niter: 200000
+  ]
+  logger:[
+    print_freq: 200
+    save_checkpoint_freq: 1000.0
+  ]
+  is_train: True
+
+21-07-29 21:55:24.732 - INFO: Random seed: 0
+21-07-29 21:55:24.737 - INFO: Dataset [LRHRDataset - PBVS21_Train] is created.
+21-07-29 21:55:24.737 - INFO: Number of train images: 951, iters: 119
+21-07-29 21:55:24.737 - INFO: Total epochs needed: 1681 for iters 200,000
+21-07-29 21:55:24.738 - INFO: Dataset [LRHRDataset - PBVS21_Val] is created.
+21-07-29 21:55:24.738 - INFO: Number of val images in [PBVS21_Val]: 50
+21-07-29 21:55:24.860 - INFO: Initialization method [kaiming]
+21-07-29 21:55:36.152 - INFO: Network G structure: DataParallel - OurGen, with parameters: 14,479,141
+21-07-29 21:55:36.152 - INFO: OurGen(
+  (model): VKGen(
+    (cn1): Sequential(
+      (0): Conv2d(3, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+    (cn2): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+    )
+    (b1): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b2): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b3): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b4): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b5): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b6): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b7): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (b8): BB(
+      (b11): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b12): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (b13): CSB(
+        (conv0): Sequential(
+          (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv1): Sequential(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv2): Sequential(
+          (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (conv3): Sequential(
+          (0): Conv2d(192, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (res1): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+        (res2): Residual(
+          (conv1): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (conv2): Sequential(
+            (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2, 2))
+            (1): LeakyReLU(negative_slope=0.2, inplace=True)
+          )
+          (pa): PA(
+            (c1): Sequential(
+              (0): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): LeakyReLU(negative_slope=0.2, inplace=True)
+            )
+          )
+          (ca): CA(
+            (g): AdaptiveAvgPool2d(output_size=(1, 1))
+            (c1): Sequential(
+              (0): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+              (1): PReLU(num_parameters=1)
+            )
+            (c2): Sequential(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+              (1): Sigmoid()
+            )
+          )
+        )
+      )
+      (c1): Sequential(
+        (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+        (1): LeakyReLU(negative_slope=0.2, inplace=True)
+      )
+    )
+    (c1): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c2): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c3): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c4): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c5): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c6): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c7): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (c8): Sequential(
+      (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    )
+    (grl): Upsample(scale_factor=4.0, mode=bicubic)
+    (ups1): OurUpSample(
+      (U1): Sequential(
+        (0): Conv2d(128, 2048, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PixelShuffle(upscale_factor=4)
+        (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (3): ReLU(inplace=True)
+      )
+      (co1): Sequential(
+        (0): Conv2d(128, 16, kernel_size=(1, 1), stride=(1, 1))
+        (1): PReLU(num_parameters=1)
+      )
+      (co2): Sequential(
+        (0): Conv2d(16, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): PReLU(num_parameters=1)
+      )
+    )
+  )
+)
+21-07-29 21:55:36.165 - INFO: Model [ourModel] is created.
+21-07-29 21:55:36.165 - INFO: Start training from epoch: 0, iter: 0
+21-07-29 21:57:26.878 - INFO: <epoch:  1, iter:     200, lr:2.000e-04> l_pix: 2.3400e-02 
+21-07-29 21:59:17.710 - INFO: <epoch:  3, iter:     400, lr:2.000e-04> l_pix: 2.0679e-02 
+21-07-29 22:01:08.553 - INFO: <epoch:  5, iter:     600, lr:2.000e-04> l_pix: 1.8982e-02 
+21-07-29 22:02:59.169 - INFO: <epoch:  6, iter:     800, lr:2.000e-04> l_pix: 2.6570e-02 
+21-07-29 22:04:50.345 - INFO: <epoch:  8, iter:   1,000, lr:2.000e-04> l_pix: 2.4603e-02 
+21-07-29 22:04:59.305 - INFO: # Validation # PSNR: 3.0297e+01
+21-07-29 22:04:59.305 - INFO: <epoch:  8, iter:   1,000> psnr: 3.0297e+01
+21-07-29 22:04:59.305 - INFO: Saving models and training states.
+21-07-29 22:06:50.871 - INFO: <epoch: 10, iter:   1,200, lr:2.000e-04> l_pix: 2.1639e-02 
+21-07-29 22:08:42.184 - INFO: <epoch: 11, iter:   1,400, lr:2.000e-04> l_pix: 2.1242e-02 
+21-07-29 22:10:33.339 - INFO: <epoch: 13, iter:   1,600, lr:2.000e-04> l_pix: 1.7238e-02 
+21-07-29 22:12:24.284 - INFO: <epoch: 15, iter:   1,800, lr:2.000e-04> l_pix: 2.4466e-02 
+21-07-29 22:14:14.882 - INFO: <epoch: 16, iter:   2,000, lr:2.000e-04> l_pix: 2.3238e-02 
+21-07-29 22:14:23.810 - INFO: # Validation # PSNR: 2.8302e+01
+21-07-29 22:14:23.810 - INFO: <epoch: 16, iter:   2,000> psnr: 2.8302e+01
+21-07-29 22:14:23.811 - INFO: Saving models and training states.
+21-07-29 22:16:15.243 - INFO: <epoch: 18, iter:   2,200, lr:2.000e-04> l_pix: 1.8304e-02 
+21-07-29 22:18:06.371 - INFO: <epoch: 20, iter:   2,400, lr:2.000e-04> l_pix: 2.4907e-02 
+21-07-29 22:19:57.621 - INFO: <epoch: 22, iter:   2,600, lr:2.000e-04> l_pix: 1.8962e-02 
+21-07-29 22:21:33.259 - INFO: <epoch: 23, iter:   2,800, lr:2.000e-04> l_pix: 1.9911e-02 
+21-07-29 22:22:53.768 - INFO: <epoch: 25, iter:   3,000, lr:2.000e-04> l_pix: 2.3737e-02 
+21-07-29 22:23:02.691 - INFO: # Validation # PSNR: 2.9022e+01
+21-07-29 22:23:02.692 - INFO: <epoch: 25, iter:   3,000> psnr: 2.9022e+01
+21-07-29 22:23:02.692 - INFO: Saving models and training states.
+21-07-29 22:24:54.504 - INFO: <epoch: 27, iter:   3,200, lr:2.000e-04> l_pix: 2.5235e-02 
+21-07-29 22:26:45.233 - INFO: <epoch: 28, iter:   3,400, lr:2.000e-04> l_pix: 2.5870e-02 
+21-07-29 22:28:36.496 - INFO: <epoch: 30, iter:   3,600, lr:2.000e-04> l_pix: 1.7943e-02 
+21-07-29 22:30:22.764 - INFO: <epoch: 32, iter:   3,800, lr:2.000e-04> l_pix: 1.9153e-02 
+21-07-29 22:31:34.180 - INFO: <epoch: 33, iter:   4,000, lr:2.000e-04> l_pix: 2.5223e-02 
+21-07-29 22:31:43.109 - INFO: # Validation # PSNR: 3.1096e+01
+21-07-29 22:31:43.110 - INFO: <epoch: 33, iter:   4,000> psnr: 3.1096e+01
+21-07-29 22:31:43.110 - INFO: Saving models and training states.
+21-07-29 22:33:34.683 - INFO: <epoch: 35, iter:   4,200, lr:2.000e-04> l_pix: 1.6798e-02 
+21-07-29 22:35:26.296 - INFO: <epoch: 37, iter:   4,400, lr:2.000e-04> l_pix: 1.8544e-02 
+21-07-29 22:37:17.129 - INFO: <epoch: 38, iter:   4,600, lr:2.000e-04> l_pix: 2.0551e-02 
+21-07-29 22:39:09.279 - INFO: <epoch: 40, iter:   4,800, lr:2.000e-04> l_pix: 2.4574e-02 
+21-07-29 22:41:00.457 - INFO: <epoch: 42, iter:   5,000, lr:2.000e-04> l_pix: 1.9859e-02 
+21-07-29 22:41:09.371 - INFO: # Validation # PSNR: 3.1174e+01
+21-07-29 22:41:09.371 - INFO: <epoch: 42, iter:   5,000> psnr: 3.1174e+01
+21-07-29 22:41:09.372 - INFO: Saving models and training states.
+21-07-29 22:43:00.917 - INFO: <epoch: 44, iter:   5,200, lr:2.000e-04> l_pix: 2.0616e-02 
+21-07-29 22:44:52.407 - INFO: <epoch: 45, iter:   5,400, lr:2.000e-04> l_pix: 2.2284e-02 
+21-07-29 22:46:43.512 - INFO: <epoch: 47, iter:   5,600, lr:2.000e-04> l_pix: 2.3968e-02 
+21-07-29 22:48:34.536 - INFO: <epoch: 49, iter:   5,800, lr:2.000e-04> l_pix: 3.5559e-02 
+21-07-29 22:50:25.352 - INFO: <epoch: 50, iter:   6,000, lr:2.000e-04> l_pix: 2.0756e-02 
+21-07-29 22:50:34.293 - INFO: # Validation # PSNR: 2.7293e+01
+21-07-29 22:50:34.293 - INFO: <epoch: 50, iter:   6,000> psnr: 2.7293e+01
+21-07-29 22:50:34.294 - INFO: Saving models and training states.
+21-07-29 22:52:25.745 - INFO: <epoch: 52, iter:   6,200, lr:2.000e-04> l_pix: 2.2344e-02 
+21-07-29 22:54:16.918 - INFO: <epoch: 54, iter:   6,400, lr:2.000e-04> l_pix: 2.0907e-02 
+21-07-29 22:56:07.755 - INFO: <epoch: 55, iter:   6,600, lr:2.000e-04> l_pix: 2.6140e-02 
+21-07-29 22:57:58.857 - INFO: <epoch: 57, iter:   6,800, lr:2.000e-04> l_pix: 2.3264e-02 
+21-07-29 22:59:49.931 - INFO: <epoch: 59, iter:   7,000, lr:2.000e-04> l_pix: 2.0822e-02 
+21-07-29 22:59:58.859 - INFO: # Validation # PSNR: 3.1213e+01
+21-07-29 22:59:58.860 - INFO: <epoch: 59, iter:   7,000> psnr: 3.1213e+01
+21-07-29 22:59:58.860 - INFO: Saving models and training states.
+21-07-29 23:01:50.229 - INFO: <epoch: 61, iter:   7,200, lr:2.000e-04> l_pix: 1.6349e-02 
+21-07-29 23:03:41.484 - INFO: <epoch: 62, iter:   7,400, lr:2.000e-04> l_pix: 1.5997e-02 
+21-07-29 23:05:32.844 - INFO: <epoch: 64, iter:   7,600, lr:2.000e-04> l_pix: 2.6658e-02 
+21-07-29 23:07:23.990 - INFO: <epoch: 66, iter:   7,800, lr:2.000e-04> l_pix: 1.9498e-02 
+21-07-29 23:09:14.809 - INFO: <epoch: 67, iter:   8,000, lr:2.000e-04> l_pix: 2.4966e-02 
+21-07-29 23:09:23.721 - INFO: # Validation # PSNR: 2.9451e+01
+21-07-29 23:09:23.721 - INFO: <epoch: 67, iter:   8,000> psnr: 2.9451e+01
+21-07-29 23:09:23.722 - INFO: Saving models and training states.
+21-07-29 23:11:15.165 - INFO: <epoch: 69, iter:   8,200, lr:2.000e-04> l_pix: 2.3177e-02 
+21-07-29 23:13:06.167 - INFO: <epoch: 71, iter:   8,400, lr:2.000e-04> l_pix: 2.3898e-02 
+21-07-29 23:14:56.620 - INFO: <epoch: 72, iter:   8,600, lr:2.000e-04> l_pix: 1.9624e-02 
+21-07-29 23:16:47.870 - INFO: <epoch: 74, iter:   8,800, lr:2.000e-04> l_pix: 2.0876e-02 
+21-07-29 23:18:39.058 - INFO: <epoch: 76, iter:   9,000, lr:2.000e-04> l_pix: 1.6929e-02 
+21-07-29 23:18:47.967 - INFO: # Validation # PSNR: 2.7610e+01
+21-07-29 23:18:47.968 - INFO: <epoch: 76, iter:   9,000> psnr: 2.7610e+01
+21-07-29 23:18:47.968 - INFO: Saving models and training states.
+21-07-29 23:20:38.939 - INFO: <epoch: 77, iter:   9,200, lr:2.000e-04> l_pix: 2.6564e-02 
+21-07-29 23:22:30.220 - INFO: <epoch: 79, iter:   9,400, lr:2.000e-04> l_pix: 1.8704e-02 
+21-07-29 23:24:21.577 - INFO: <epoch: 81, iter:   9,600, lr:2.000e-04> l_pix: 1.7574e-02 
+21-07-29 23:26:12.646 - INFO: <epoch: 83, iter:   9,800, lr:2.000e-04> l_pix: 2.5596e-02 
+21-07-29 23:28:03.363 - INFO: <epoch: 84, iter:  10,000, lr:2.000e-04> l_pix: 2.0024e-02 
+21-07-29 23:28:12.259 - INFO: # Validation # PSNR: 2.7638e+01
+21-07-29 23:28:12.259 - INFO: <epoch: 84, iter:  10,000> psnr: 2.7638e+01
+21-07-29 23:28:12.260 - INFO: Saving models and training states.
+21-07-29 23:30:03.715 - INFO: <epoch: 86, iter:  10,200, lr:2.000e-04> l_pix: 2.3061e-02 
+21-07-29 23:31:54.827 - INFO: <epoch: 88, iter:  10,400, lr:2.000e-04> l_pix: 1.9261e-02 
+21-07-29 23:33:45.327 - INFO: <epoch: 89, iter:  10,600, lr:2.000e-04> l_pix: 1.9262e-02 
+21-07-29 23:35:36.441 - INFO: <epoch: 91, iter:  10,800, lr:2.000e-04> l_pix: 1.9496e-02 
+21-07-29 23:37:27.549 - INFO: <epoch: 93, iter:  11,000, lr:2.000e-04> l_pix: 2.0658e-02 
+21-07-29 23:37:36.451 - INFO: # Validation # PSNR: 2.9221e+01
+21-07-29 23:37:36.451 - INFO: <epoch: 93, iter:  11,000> psnr: 2.9221e+01
+21-07-29 23:37:36.452 - INFO: Saving models and training states.
+21-07-29 23:39:27.382 - INFO: <epoch: 94, iter:  11,200, lr:2.000e-04> l_pix: 1.9361e-02 
+21-07-29 23:41:18.534 - INFO: <epoch: 96, iter:  11,400, lr:2.000e-04> l_pix: 1.9676e-02 
+21-07-29 23:43:09.595 - INFO: <epoch: 98, iter:  11,600, lr:2.000e-04> l_pix: 2.2973e-02 
+21-07-29 23:45:00.293 - INFO: <epoch: 99, iter:  11,800, lr:2.000e-04> l_pix: 2.1698e-02 
+21-07-29 23:46:51.473 - INFO: <epoch:101, iter:  12,000, lr:2.000e-04> l_pix: 1.9770e-02 
+21-07-29 23:47:00.361 - INFO: # Validation # PSNR: 3.0159e+01
+21-07-29 23:47:00.361 - INFO: <epoch:101, iter:  12,000> psnr: 3.0159e+01
+21-07-29 23:47:00.362 - INFO: Saving models and training states.
+21-07-29 23:48:51.868 - INFO: <epoch:103, iter:  12,200, lr:2.000e-04> l_pix: 1.9085e-02 
+21-07-29 23:50:42.878 - INFO: <epoch:105, iter:  12,400, lr:2.000e-04> l_pix: 1.5163e-02 
+21-07-29 23:52:33.581 - INFO: <epoch:106, iter:  12,600, lr:2.000e-04> l_pix: 1.5818e-02 
+21-07-29 23:54:24.887 - INFO: <epoch:108, iter:  12,800, lr:2.000e-04> l_pix: 2.0891e-02 
+21-07-29 23:56:15.999 - INFO: <epoch:110, iter:  13,000, lr:2.000e-04> l_pix: 2.4479e-02 
+21-07-29 23:56:24.920 - INFO: # Validation # PSNR: 2.8136e+01
+21-07-29 23:56:24.920 - INFO: <epoch:110, iter:  13,000> psnr: 2.8136e+01
+21-07-29 23:56:24.920 - INFO: Saving models and training states.
+21-07-29 23:58:16.083 - INFO: <epoch:111, iter:  13,200, lr:2.000e-04> l_pix: 3.0319e-02 
+21-07-30 00:00:00.771 - INFO: <epoch:113, iter:  13,400, lr:2.000e-04> l_pix: 1.9510e-02 
+21-07-30 00:00:59.252 - INFO: <epoch:115, iter:  13,600, lr:2.000e-04> l_pix: 2.5775e-02 
+21-07-30 00:01:57.244 - INFO: <epoch:116, iter:  13,800, lr:2.000e-04> l_pix: 2.0993e-02 
+21-07-30 00:02:55.666 - INFO: <epoch:118, iter:  14,000, lr:2.000e-04> l_pix: 1.9634e-02 
+21-07-30 00:03:00.865 - INFO: # Validation # PSNR: 2.9412e+01
+21-07-30 00:03:00.865 - INFO: <epoch:118, iter:  14,000> psnr: 2.9412e+01
+21-07-30 00:03:00.865 - INFO: Saving models and training states.
+21-07-30 00:03:59.723 - INFO: <epoch:120, iter:  14,200, lr:2.000e-04> l_pix: 2.4910e-02 
+21-07-30 00:04:58.229 - INFO: <epoch:122, iter:  14,400, lr:2.000e-04> l_pix: 2.1307e-02 
+21-07-30 00:05:56.217 - INFO: <epoch:123, iter:  14,600, lr:2.000e-04> l_pix: 1.8191e-02 
+21-07-30 00:06:54.778 - INFO: <epoch:125, iter:  14,800, lr:2.000e-04> l_pix: 2.5588e-02 
+21-07-30 00:07:53.327 - INFO: <epoch:127, iter:  15,000, lr:2.000e-04> l_pix: 2.5217e-02 
+21-07-30 00:07:58.524 - INFO: # Validation # PSNR: 2.8430e+01
+21-07-30 00:07:58.525 - INFO: <epoch:127, iter:  15,000> psnr: 2.8430e+01
+21-07-30 00:07:58.525 - INFO: Saving models and training states.
+21-07-30 00:08:57.048 - INFO: <epoch:128, iter:  15,200, lr:2.000e-04> l_pix: 1.9224e-02 
+21-07-30 00:09:55.606 - INFO: <epoch:130, iter:  15,400, lr:2.000e-04> l_pix: 2.9351e-02 
+21-07-30 00:10:53.909 - INFO: <epoch:132, iter:  15,600, lr:2.000e-04> l_pix: 2.4616e-02 
+21-07-30 00:11:51.897 - INFO: <epoch:133, iter:  15,800, lr:2.000e-04> l_pix: 2.8135e-02 
+21-07-30 00:12:50.579 - INFO: <epoch:135, iter:  16,000, lr:2.000e-04> l_pix: 2.2292e-02 
+21-07-30 00:12:55.740 - INFO: # Validation # PSNR: 2.6092e+01
+21-07-30 00:12:55.740 - INFO: <epoch:135, iter:  16,000> psnr: 2.6092e+01
+21-07-30 00:12:55.741 - INFO: Saving models and training states.
+21-07-30 00:13:54.692 - INFO: <epoch:137, iter:  16,200, lr:2.000e-04> l_pix: 2.0188e-02 
+21-07-30 00:14:52.721 - INFO: <epoch:138, iter:  16,400, lr:2.000e-04> l_pix: 1.9899e-02 
+21-07-30 00:15:51.061 - INFO: <epoch:140, iter:  16,600, lr:2.000e-04> l_pix: 1.5797e-02 
+21-07-30 00:16:49.455 - INFO: <epoch:142, iter:  16,800, lr:2.000e-04> l_pix: 2.2999e-02 
+21-07-30 00:17:47.175 - INFO: <epoch:144, iter:  17,000, lr:2.000e-04> l_pix: 2.7563e-02 
+21-07-30 00:17:52.324 - INFO: # Validation # PSNR: 2.6115e+01
+21-07-30 00:17:52.324 - INFO: <epoch:144, iter:  17,000> psnr: 2.6115e+01
+21-07-30 00:17:52.324 - INFO: Saving models and training states.
+21-07-30 00:18:50.373 - INFO: <epoch:145, iter:  17,200, lr:2.000e-04> l_pix: 2.1641e-02 
+21-07-30 00:19:49.048 - INFO: <epoch:147, iter:  17,400, lr:2.000e-04> l_pix: 1.7740e-02 
+21-07-30 00:20:47.580 - INFO: <epoch:149, iter:  17,600, lr:2.000e-04> l_pix: 1.9427e-02 
+21-07-30 00:21:45.466 - INFO: <epoch:150, iter:  17,800, lr:2.000e-04> l_pix: 1.9070e-02 
+21-07-30 00:22:44.060 - INFO: <epoch:152, iter:  18,000, lr:2.000e-04> l_pix: 1.9504e-02 
+21-07-30 00:22:49.278 - INFO: # Validation # PSNR: 2.8842e+01
+21-07-30 00:22:49.279 - INFO: <epoch:152, iter:  18,000> psnr: 2.8842e+01
+21-07-30 00:22:49.279 - INFO: Saving models and training states.
+21-07-30 00:23:48.153 - INFO: <epoch:154, iter:  18,200, lr:2.000e-04> l_pix: 1.8356e-02 
+21-07-30 00:24:46.303 - INFO: <epoch:155, iter:  18,400, lr:2.000e-04> l_pix: 1.9982e-02 
+21-07-30 00:25:44.734 - INFO: <epoch:157, iter:  18,600, lr:2.000e-04> l_pix: 2.1409e-02 
+21-07-30 00:26:43.231 - INFO: <epoch:159, iter:  18,800, lr:2.000e-04> l_pix: 1.9166e-02 
+21-07-30 00:27:41.541 - INFO: <epoch:161, iter:  19,000, lr:2.000e-04> l_pix: 2.4396e-02 
+21-07-30 00:27:46.714 - INFO: # Validation # PSNR: 2.9582e+01
+21-07-30 00:27:46.714 - INFO: <epoch:161, iter:  19,000> psnr: 2.9582e+01
+21-07-30 00:27:46.714 - INFO: Saving models and training states.
+21-07-30 00:28:44.910 - INFO: <epoch:162, iter:  19,200, lr:2.000e-04> l_pix: 2.4408e-02 
+21-07-30 00:29:43.143 - INFO: <epoch:164, iter:  19,400, lr:2.000e-04> l_pix: 2.2006e-02 
+21-07-30 00:30:41.460 - INFO: <epoch:166, iter:  19,600, lr:2.000e-04> l_pix: 2.1926e-02 
+21-07-30 00:31:39.323 - INFO: <epoch:167, iter:  19,800, lr:2.000e-04> l_pix: 2.8978e-02 
+21-07-30 00:32:37.968 - INFO: <epoch:169, iter:  20,000, lr:2.000e-04> l_pix: 1.8142e-02 
+21-07-30 00:32:43.141 - INFO: # Validation # PSNR: 2.8534e+01
+21-07-30 00:32:43.141 - INFO: <epoch:169, iter:  20,000> psnr: 2.8534e+01
+21-07-30 00:32:43.142 - INFO: Saving models and training states.
+21-07-30 00:33:41.760 - INFO: <epoch:171, iter:  20,200, lr:2.000e-04> l_pix: 1.8112e-02 
+21-07-30 00:34:39.803 - INFO: <epoch:172, iter:  20,400, lr:2.000e-04> l_pix: 2.0588e-02 
+21-07-30 00:35:38.109 - INFO: <epoch:174, iter:  20,600, lr:2.000e-04> l_pix: 1.7875e-02 
+21-07-30 00:36:36.603 - INFO: <epoch:176, iter:  20,800, lr:2.000e-04> l_pix: 1.7325e-02 
+21-07-30 00:37:34.583 - INFO: <epoch:177, iter:  21,000, lr:2.000e-04> l_pix: 2.3449e-02 
+21-07-30 00:37:39.750 - INFO: # Validation # PSNR: 2.6901e+01
+21-07-30 00:37:39.750 - INFO: <epoch:177, iter:  21,000> psnr: 2.6901e+01
+21-07-30 00:37:39.750 - INFO: Saving models and training states.
+21-07-30 00:38:38.471 - INFO: <epoch:179, iter:  21,200, lr:2.000e-04> l_pix: 2.2663e-02 
+21-07-30 00:39:36.802 - INFO: <epoch:181, iter:  21,400, lr:2.000e-04> l_pix: 2.0284e-02 
+21-07-30 00:40:35.274 - INFO: <epoch:183, iter:  21,600, lr:2.000e-04> l_pix: 2.2821e-02 
+21-07-30 00:41:33.296 - INFO: <epoch:184, iter:  21,800, lr:2.000e-04> l_pix: 1.9861e-02 
+21-07-30 00:42:31.653 - INFO: <epoch:186, iter:  22,000, lr:2.000e-04> l_pix: 1.7628e-02 
+21-07-30 00:42:36.863 - INFO: # Validation # PSNR: 2.8038e+01
+21-07-30 00:42:36.863 - INFO: <epoch:186, iter:  22,000> psnr: 2.8038e+01
+21-07-30 00:42:36.864 - INFO: Saving models and training states.
+21-07-30 00:43:35.624 - INFO: <epoch:188, iter:  22,200, lr:2.000e-04> l_pix: 1.8854e-02 
+21-07-30 00:44:33.402 - INFO: <epoch:189, iter:  22,400, lr:2.000e-04> l_pix: 1.8565e-02 
+21-07-30 00:45:32.023 - INFO: <epoch:191, iter:  22,600, lr:2.000e-04> l_pix: 1.6876e-02 
+21-07-30 00:46:30.244 - INFO: <epoch:193, iter:  22,800, lr:2.000e-04> l_pix: 1.9419e-02 
+21-07-30 00:47:28.227 - INFO: <epoch:194, iter:  23,000, lr:2.000e-04> l_pix: 2.7279e-02 
+21-07-30 00:47:33.451 - INFO: # Validation # PSNR: 2.8444e+01
+21-07-30 00:47:33.451 - INFO: <epoch:194, iter:  23,000> psnr: 2.8444e+01
+21-07-30 00:47:33.452 - INFO: Saving models and training states.
+21-07-30 00:48:31.788 - INFO: <epoch:196, iter:  23,200, lr:2.000e-04> l_pix: 1.5813e-02 
+21-07-30 00:49:30.299 - INFO: <epoch:198, iter:  23,400, lr:2.000e-04> l_pix: 3.0274e-02 
+21-07-30 00:50:28.370 - INFO: <epoch:199, iter:  23,600, lr:2.000e-04> l_pix: 1.9168e-02 
+21-07-30 00:51:26.646 - INFO: <epoch:201, iter:  23,800, lr:2.000e-04> l_pix: 1.8706e-02 
+21-07-30 00:52:24.935 - INFO: <epoch:203, iter:  24,000, lr:2.000e-04> l_pix: 1.8166e-02 
+21-07-30 00:52:30.104 - INFO: # Validation # PSNR: 2.7367e+01
+21-07-30 00:52:30.105 - INFO: <epoch:203, iter:  24,000> psnr: 2.7367e+01
+21-07-30 00:52:30.105 - INFO: Saving models and training states.
+21-07-30 00:53:28.560 - INFO: <epoch:205, iter:  24,200, lr:2.000e-04> l_pix: 2.2270e-02 
+21-07-30 00:54:25.909 - INFO: <epoch:206, iter:  24,400, lr:2.000e-04> l_pix: 1.9338e-02 
+21-07-30 00:55:24.048 - INFO: <epoch:208, iter:  24,600, lr:2.000e-04> l_pix: 2.0816e-02 
+21-07-30 00:56:22.161 - INFO: <epoch:210, iter:  24,800, lr:2.000e-04> l_pix: 2.3928e-02 
+21-07-30 00:57:19.516 - INFO: <epoch:211, iter:  25,000, lr:2.000e-04> l_pix: 2.0838e-02 
+21-07-30 00:57:24.695 - INFO: # Validation # PSNR: 2.8840e+01
+21-07-30 00:57:24.696 - INFO: <epoch:211, iter:  25,000> psnr: 2.8840e+01
+21-07-30 00:57:24.697 - INFO: Saving models and training states.
+21-07-30 00:58:22.945 - INFO: <epoch:213, iter:  25,200, lr:2.000e-04> l_pix: 2.0013e-02 
+21-07-30 00:59:21.140 - INFO: <epoch:215, iter:  25,400, lr:2.000e-04> l_pix: 1.8061e-02 
+21-07-30 01:00:18.852 - INFO: <epoch:216, iter:  25,600, lr:2.000e-04> l_pix: 2.5241e-02 
+21-07-30 01:01:16.908 - INFO: <epoch:218, iter:  25,800, lr:2.000e-04> l_pix: 1.5474e-02 
+21-07-30 01:02:15.248 - INFO: <epoch:220, iter:  26,000, lr:2.000e-04> l_pix: 2.1964e-02 
+21-07-30 01:02:20.440 - INFO: # Validation # PSNR: 2.6647e+01
+21-07-30 01:02:20.440 - INFO: <epoch:220, iter:  26,000> psnr: 2.6647e+01
+21-07-30 01:02:20.440 - INFO: Saving models and training states.
+21-07-30 01:03:18.838 - INFO: <epoch:222, iter:  26,200, lr:2.000e-04> l_pix: 1.8498e-02 
+21-07-30 01:04:16.499 - INFO: <epoch:223, iter:  26,400, lr:2.000e-04> l_pix: 1.8503e-02 
+21-07-30 01:05:14.678 - INFO: <epoch:225, iter:  26,600, lr:2.000e-04> l_pix: 2.5380e-02 
+21-07-30 01:06:12.635 - INFO: <epoch:227, iter:  26,800, lr:2.000e-04> l_pix: 2.9033e-02 
+21-07-30 01:07:10.016 - INFO: <epoch:228, iter:  27,000, lr:2.000e-04> l_pix: 2.1148e-02 
+21-07-30 01:07:15.184 - INFO: # Validation # PSNR: 2.7382e+01
+21-07-30 01:07:15.184 - INFO: <epoch:228, iter:  27,000> psnr: 2.7382e+01
+21-07-30 01:07:15.185 - INFO: Saving models and training states.
+21-07-30 01:08:13.516 - INFO: <epoch:230, iter:  27,200, lr:2.000e-04> l_pix: 1.9014e-02 
+21-07-30 01:09:11.445 - INFO: <epoch:232, iter:  27,400, lr:2.000e-04> l_pix: 1.8212e-02 
+21-07-30 01:10:09.239 - INFO: <epoch:233, iter:  27,600, lr:2.000e-04> l_pix: 2.2772e-02 
+21-07-30 01:11:07.351 - INFO: <epoch:235, iter:  27,800, lr:2.000e-04> l_pix: 1.8829e-02 
+21-07-30 01:12:05.312 - INFO: <epoch:237, iter:  28,000, lr:2.000e-04> l_pix: 1.7347e-02 
+21-07-30 01:12:10.511 - INFO: # Validation # PSNR: 2.8484e+01
+21-07-30 01:12:10.511 - INFO: <epoch:237, iter:  28,000> psnr: 2.8484e+01
+21-07-30 01:12:10.512 - INFO: Saving models and training states.
+21-07-30 01:13:08.714 - INFO: <epoch:238, iter:  28,200, lr:2.000e-04> l_pix: 2.1635e-02 
+21-07-30 01:14:06.852 - INFO: <epoch:240, iter:  28,400, lr:2.000e-04> l_pix: 2.3621e-02 
+21-07-30 01:15:05.022 - INFO: <epoch:242, iter:  28,600, lr:2.000e-04> l_pix: 2.0591e-02 
+21-07-30 01:16:03.157 - INFO: <epoch:244, iter:  28,800, lr:2.000e-04> l_pix: 1.5858e-02 
+21-07-30 01:17:00.873 - INFO: <epoch:245, iter:  29,000, lr:2.000e-04> l_pix: 1.8733e-02 
+21-07-30 01:17:06.086 - INFO: # Validation # PSNR: 2.7404e+01
+21-07-30 01:17:06.086 - INFO: <epoch:245, iter:  29,000> psnr: 2.7404e+01
+21-07-30 01:17:06.087 - INFO: Saving models and training states.
+21-07-30 01:18:04.691 - INFO: <epoch:247, iter:  29,200, lr:2.000e-04> l_pix: 1.4898e-02 
+21-07-30 01:19:02.841 - INFO: <epoch:249, iter:  29,400, lr:2.000e-04> l_pix: 1.6573e-02 
+21-07-30 01:20:00.684 - INFO: <epoch:250, iter:  29,600, lr:2.000e-04> l_pix: 2.1866e-02 
+21-07-30 01:20:59.062 - INFO: <epoch:252, iter:  29,800, lr:2.000e-04> l_pix: 2.1044e-02 
+21-07-30 01:21:57.314 - INFO: <epoch:254, iter:  30,000, lr:2.000e-04> l_pix: 2.4461e-02 
+21-07-30 01:22:02.507 - INFO: # Validation # PSNR: 2.6741e+01
+21-07-30 01:22:02.507 - INFO: <epoch:254, iter:  30,000> psnr: 2.6741e+01
+21-07-30 01:22:02.508 - INFO: Saving models and training states.
+21-07-30 01:23:00.601 - INFO: <epoch:255, iter:  30,200, lr:2.000e-04> l_pix: 1.7612e-02 
+21-07-30 01:23:58.735 - INFO: <epoch:257, iter:  30,400, lr:2.000e-04> l_pix: 1.5880e-02 
+21-07-30 01:24:56.530 - INFO: <epoch:259, iter:  30,600, lr:2.000e-04> l_pix: 1.8104e-02 
+21-07-30 01:25:54.578 - INFO: <epoch:261, iter:  30,800, lr:2.000e-04> l_pix: 2.1024e-02 
+21-07-30 01:26:52.110 - INFO: <epoch:262, iter:  31,000, lr:2.000e-04> l_pix: 2.2050e-02 
+21-07-30 01:26:57.282 - INFO: # Validation # PSNR: 2.6839e+01
+21-07-30 01:26:57.282 - INFO: <epoch:262, iter:  31,000> psnr: 2.6839e+01
+21-07-30 01:26:57.282 - INFO: Saving models and training states.
+21-07-30 01:27:55.816 - INFO: <epoch:264, iter:  31,200, lr:2.000e-04> l_pix: 1.5322e-02 
+21-07-30 01:28:54.067 - INFO: <epoch:266, iter:  31,400, lr:2.000e-04> l_pix: 1.8574e-02 
+21-07-30 01:29:51.441 - INFO: <epoch:267, iter:  31,600, lr:2.000e-04> l_pix: 2.2477e-02 
+21-07-30 01:30:49.507 - INFO: <epoch:269, iter:  31,800, lr:2.000e-04> l_pix: 2.9764e-02 
+21-07-30 01:31:47.773 - INFO: <epoch:271, iter:  32,000, lr:2.000e-04> l_pix: 2.0636e-02 
+21-07-30 01:31:52.940 - INFO: # Validation # PSNR: 2.5306e+01
+21-07-30 01:31:52.940 - INFO: <epoch:271, iter:  32,000> psnr: 2.5306e+01
+21-07-30 01:31:52.941 - INFO: Saving models and training states.
+21-07-30 01:32:50.628 - INFO: <epoch:272, iter:  32,200, lr:2.000e-04> l_pix: 1.9415e-02 
+21-07-30 01:33:48.704 - INFO: <epoch:274, iter:  32,400, lr:2.000e-04> l_pix: 1.7809e-02 
+21-07-30 01:34:46.884 - INFO: <epoch:276, iter:  32,600, lr:2.000e-04> l_pix: 2.0947e-02 
+21-07-30 01:35:44.680 - INFO: <epoch:277, iter:  32,800, lr:2.000e-04> l_pix: 1.9554e-02 
+21-07-30 01:36:42.723 - INFO: <epoch:279, iter:  33,000, lr:2.000e-04> l_pix: 2.5663e-02 
+21-07-30 01:36:47.890 - INFO: # Validation # PSNR: 2.6613e+01
+21-07-30 01:36:47.890 - INFO: <epoch:279, iter:  33,000> psnr: 2.6613e+01
+21-07-30 01:36:47.890 - INFO: Saving models and training states.
+21-07-30 01:37:46.143 - INFO: <epoch:281, iter:  33,200, lr:2.000e-04> l_pix: 2.1217e-02 
+21-07-30 01:38:43.940 - INFO: <epoch:283, iter:  33,400, lr:2.000e-04> l_pix: 2.0003e-02 
+21-07-30 01:39:41.522 - INFO: <epoch:284, iter:  33,600, lr:2.000e-04> l_pix: 2.0426e-02 
+21-07-30 01:40:39.472 - INFO: <epoch:286, iter:  33,800, lr:2.000e-04> l_pix: 2.8841e-02 
+21-07-30 01:41:37.244 - INFO: <epoch:288, iter:  34,000, lr:2.000e-04> l_pix: 1.7245e-02 
+21-07-30 01:41:42.415 - INFO: # Validation # PSNR: 2.8192e+01
+21-07-30 01:41:42.415 - INFO: <epoch:288, iter:  34,000> psnr: 2.8192e+01
+21-07-30 01:41:42.416 - INFO: Saving models and training states.
+21-07-30 01:42:40.287 - INFO: <epoch:289, iter:  34,200, lr:2.000e-04> l_pix: 2.6664e-02 
+21-07-30 01:43:38.466 - INFO: <epoch:291, iter:  34,400, lr:2.000e-04> l_pix: 1.7903e-02 
+21-07-30 01:44:36.796 - INFO: <epoch:293, iter:  34,600, lr:2.000e-04> l_pix: 1.9844e-02 
+21-07-30 01:45:34.562 - INFO: <epoch:294, iter:  34,800, lr:2.000e-04> l_pix: 1.8683e-02 
+21-07-30 01:46:32.500 - INFO: <epoch:296, iter:  35,000, lr:2.000e-04> l_pix: 2.1806e-02 
+21-07-30 01:46:37.668 - INFO: # Validation # PSNR: 2.6419e+01
+21-07-30 01:46:37.668 - INFO: <epoch:296, iter:  35,000> psnr: 2.6419e+01
+21-07-30 01:46:37.669 - INFO: Saving models and training states.
+21-07-30 01:47:36.224 - INFO: <epoch:298, iter:  35,200, lr:2.000e-04> l_pix: 1.7503e-02 
+21-07-30 01:48:33.721 - INFO: <epoch:299, iter:  35,400, lr:2.000e-04> l_pix: 1.7569e-02 
+21-07-30 01:49:31.938 - INFO: <epoch:301, iter:  35,600, lr:2.000e-04> l_pix: 2.6182e-02 
+21-07-30 01:50:30.050 - INFO: <epoch:303, iter:  35,800, lr:2.000e-04> l_pix: 1.9374e-02 
+21-07-30 01:51:28.310 - INFO: <epoch:305, iter:  36,000, lr:2.000e-04> l_pix: 2.1440e-02 
+21-07-30 01:51:33.479 - INFO: # Validation # PSNR: 2.6680e+01
+21-07-30 01:51:33.480 - INFO: <epoch:305, iter:  36,000> psnr: 2.6680e+01
+21-07-30 01:51:33.480 - INFO: Saving models and training states.
+21-07-30 01:52:31.031 - INFO: <epoch:306, iter:  36,200, lr:2.000e-04> l_pix: 1.8642e-02 
+21-07-30 01:53:28.949 - INFO: <epoch:308, iter:  36,400, lr:2.000e-04> l_pix: 1.8333e-02 
+21-07-30 01:54:27.122 - INFO: <epoch:310, iter:  36,600, lr:2.000e-04> l_pix: 1.8747e-02 
+21-07-30 01:55:24.712 - INFO: <epoch:311, iter:  36,800, lr:2.000e-04> l_pix: 1.3171e-02 
+21-07-30 01:56:22.844 - INFO: <epoch:313, iter:  37,000, lr:2.000e-04> l_pix: 1.5907e-02 
+21-07-30 01:56:28.022 - INFO: # Validation # PSNR: 2.7175e+01
+21-07-30 01:56:28.023 - INFO: <epoch:313, iter:  37,000> psnr: 2.7175e+01
+21-07-30 01:56:28.023 - INFO: Saving models and training states.
+21-07-30 01:57:26.562 - INFO: <epoch:315, iter:  37,200, lr:2.000e-04> l_pix: 2.0750e-02 
+21-07-30 01:58:24.263 - INFO: <epoch:316, iter:  37,400, lr:2.000e-04> l_pix: 1.5992e-02 
+21-07-30 01:59:22.450 - INFO: <epoch:318, iter:  37,600, lr:2.000e-04> l_pix: 2.1839e-02 
+21-07-30 02:00:20.722 - INFO: <epoch:320, iter:  37,800, lr:2.000e-04> l_pix: 2.1661e-02 
+21-07-30 02:01:18.928 - INFO: <epoch:322, iter:  38,000, lr:2.000e-04> l_pix: 2.6916e-02 
+21-07-30 02:01:24.175 - INFO: # Validation # PSNR: 2.7146e+01
+21-07-30 02:01:24.175 - INFO: <epoch:322, iter:  38,000> psnr: 2.7146e+01
+21-07-30 02:01:24.176 - INFO: Saving models and training states.
+21-07-30 02:02:22.272 - INFO: <epoch:323, iter:  38,200, lr:2.000e-04> l_pix: 1.8089e-02 
+21-07-30 02:03:20.471 - INFO: <epoch:325, iter:  38,400, lr:2.000e-04> l_pix: 1.8403e-02 
+21-07-30 02:04:18.449 - INFO: <epoch:327, iter:  38,600, lr:2.000e-04> l_pix: 1.8239e-02 
+21-07-30 02:05:15.949 - INFO: <epoch:328, iter:  38,800, lr:2.000e-04> l_pix: 1.7461e-02 
+21-07-30 02:06:14.057 - INFO: <epoch:330, iter:  39,000, lr:2.000e-04> l_pix: 1.7653e-02 
+21-07-30 02:06:19.235 - INFO: # Validation # PSNR: 2.6216e+01
+21-07-30 02:06:19.236 - INFO: <epoch:330, iter:  39,000> psnr: 2.6216e+01
+21-07-30 02:06:19.236 - INFO: Saving models and training states.
+21-07-30 02:07:17.420 - INFO: <epoch:332, iter:  39,200, lr:2.000e-04> l_pix: 2.3483e-02 
+21-07-30 02:08:15.123 - INFO: <epoch:333, iter:  39,400, lr:2.000e-04> l_pix: 3.3061e-02 
+21-07-30 02:09:13.241 - INFO: <epoch:335, iter:  39,600, lr:2.000e-04> l_pix: 1.3425e-02 
+21-07-30 02:10:11.462 - INFO: <epoch:337, iter:  39,800, lr:2.000e-04> l_pix: 2.1115e-02 
+21-07-30 02:11:09.499 - INFO: <epoch:338, iter:  40,000, lr:2.000e-04> l_pix: 1.8979e-02 
+21-07-30 02:11:14.669 - INFO: # Validation # PSNR: 2.7069e+01
+21-07-30 02:11:14.670 - INFO: <epoch:338, iter:  40,000> psnr: 2.7069e+01
+21-07-30 02:11:14.670 - INFO: Saving models and training states.
+21-07-30 02:12:13.103 - INFO: <epoch:340, iter:  40,200, lr:1.000e-04> l_pix: 2.2373e-02 
+21-07-30 02:13:10.928 - INFO: <epoch:342, iter:  40,400, lr:1.000e-04> l_pix: 2.3878e-02 
+21-07-30 02:14:09.231 - INFO: <epoch:344, iter:  40,600, lr:1.000e-04> l_pix: 1.6676e-02 
+21-07-30 02:15:07.013 - INFO: <epoch:345, iter:  40,800, lr:1.000e-04> l_pix: 2.7489e-02 
+21-07-30 02:16:05.572 - INFO: <epoch:347, iter:  41,000, lr:1.000e-04> l_pix: 2.2788e-02 
+21-07-30 02:16:10.797 - INFO: # Validation # PSNR: 2.6776e+01
+21-07-30 02:16:10.797 - INFO: <epoch:347, iter:  41,000> psnr: 2.6776e+01
+21-07-30 02:16:10.797 - INFO: Saving models and training states.
+21-07-30 02:17:09.291 - INFO: <epoch:349, iter:  41,200, lr:1.000e-04> l_pix: 1.8468e-02 
+21-07-30 02:18:07.082 - INFO: <epoch:350, iter:  41,400, lr:1.000e-04> l_pix: 2.4429e-02 
+21-07-30 02:19:04.935 - INFO: <epoch:352, iter:  41,600, lr:1.000e-04> l_pix: 2.4056e-02 
+21-07-30 02:20:02.937 - INFO: <epoch:354, iter:  41,800, lr:1.000e-04> l_pix: 2.4580e-02 
+21-07-30 02:21:00.403 - INFO: <epoch:355, iter:  42,000, lr:1.000e-04> l_pix: 1.9864e-02 
+21-07-30 02:21:05.541 - INFO: # Validation # PSNR: 2.6670e+01
+21-07-30 02:21:05.542 - INFO: <epoch:355, iter:  42,000> psnr: 2.6670e+01
+21-07-30 02:21:05.542 - INFO: Saving models and training states.
+21-07-30 02:22:04.170 - INFO: <epoch:357, iter:  42,200, lr:1.000e-04> l_pix: 1.4577e-02 
+21-07-30 02:23:02.099 - INFO: <epoch:359, iter:  42,400, lr:1.000e-04> l_pix: 2.3733e-02 
+21-07-30 02:24:00.025 - INFO: <epoch:361, iter:  42,600, lr:1.000e-04> l_pix: 1.9603e-02 
+21-07-30 02:24:57.899 - INFO: <epoch:362, iter:  42,800, lr:1.000e-04> l_pix: 2.3132e-02 
+21-07-30 02:25:55.784 - INFO: <epoch:364, iter:  43,000, lr:1.000e-04> l_pix: 1.9017e-02 
+21-07-30 02:26:00.953 - INFO: # Validation # PSNR: 2.6811e+01
+21-07-30 02:26:00.953 - INFO: <epoch:364, iter:  43,000> psnr: 2.6811e+01
+21-07-30 02:26:00.954 - INFO: Saving models and training states.
+21-07-30 02:26:59.575 - INFO: <epoch:366, iter:  43,200, lr:1.000e-04> l_pix: 2.1054e-02 
+21-07-30 02:27:57.281 - INFO: <epoch:367, iter:  43,400, lr:1.000e-04> l_pix: 2.0092e-02 
+21-07-30 02:28:55.538 - INFO: <epoch:369, iter:  43,600, lr:1.000e-04> l_pix: 1.6417e-02 
+21-07-30 02:29:53.443 - INFO: <epoch:371, iter:  43,800, lr:1.000e-04> l_pix: 2.2889e-02 
+21-07-30 02:30:51.041 - INFO: <epoch:372, iter:  44,000, lr:1.000e-04> l_pix: 1.8554e-02 
+21-07-30 02:30:56.188 - INFO: # Validation # PSNR: 2.7661e+01
+21-07-30 02:30:56.189 - INFO: <epoch:372, iter:  44,000> psnr: 2.7661e+01
+21-07-30 02:30:56.189 - INFO: Saving models and training states.
+21-07-30 02:31:54.740 - INFO: <epoch:374, iter:  44,200, lr:1.000e-04> l_pix: 1.4535e-02 
+21-07-30 02:32:53.027 - INFO: <epoch:376, iter:  44,400, lr:1.000e-04> l_pix: 2.0959e-02 
+21-07-30 02:33:50.634 - INFO: <epoch:377, iter:  44,600, lr:1.000e-04> l_pix: 2.3326e-02 
+21-07-30 02:34:48.829 - INFO: <epoch:379, iter:  44,800, lr:1.000e-04> l_pix: 2.7580e-02 
+21-07-30 02:35:47.076 - INFO: <epoch:381, iter:  45,000, lr:1.000e-04> l_pix: 1.7425e-02 
+21-07-30 02:35:52.274 - INFO: # Validation # PSNR: 2.5987e+01
+21-07-30 02:35:52.275 - INFO: <epoch:381, iter:  45,000> psnr: 2.5987e+01
+21-07-30 02:35:52.275 - INFO: Saving models and training states.
+21-07-30 02:36:51.060 - INFO: <epoch:383, iter:  45,200, lr:1.000e-04> l_pix: 2.4905e-02 
+21-07-30 02:37:48.423 - INFO: <epoch:384, iter:  45,400, lr:1.000e-04> l_pix: 1.8260e-02 
+21-07-30 02:38:46.452 - INFO: <epoch:386, iter:  45,600, lr:1.000e-04> l_pix: 2.2723e-02 
+21-07-30 02:39:44.359 - INFO: <epoch:388, iter:  45,800, lr:1.000e-04> l_pix: 2.4507e-02 
+21-07-30 02:40:42.219 - INFO: <epoch:389, iter:  46,000, lr:1.000e-04> l_pix: 2.3136e-02 
+21-07-30 02:40:47.409 - INFO: # Validation # PSNR: 2.7017e+01
+21-07-30 02:40:47.409 - INFO: <epoch:389, iter:  46,000> psnr: 2.7017e+01
+21-07-30 02:40:47.410 - INFO: Saving models and training states.
+21-07-30 02:41:45.677 - INFO: <epoch:391, iter:  46,200, lr:1.000e-04> l_pix: 2.2176e-02 
+21-07-30 02:42:43.727 - INFO: <epoch:393, iter:  46,400, lr:1.000e-04> l_pix: 1.8300e-02 
+21-07-30 02:43:41.428 - INFO: <epoch:394, iter:  46,600, lr:1.000e-04> l_pix: 2.2323e-02 
+21-07-30 02:44:39.426 - INFO: <epoch:396, iter:  46,800, lr:1.000e-04> l_pix: 2.1848e-02 
+21-07-30 02:45:37.741 - INFO: <epoch:398, iter:  47,000, lr:1.000e-04> l_pix: 1.8128e-02 
+21-07-30 02:45:42.933 - INFO: # Validation # PSNR: 2.6977e+01
+21-07-30 02:45:42.933 - INFO: <epoch:398, iter:  47,000> psnr: 2.6977e+01
+21-07-30 02:45:42.933 - INFO: Saving models and training states.
+21-07-30 02:46:40.916 - INFO: <epoch:399, iter:  47,200, lr:1.000e-04> l_pix: 2.5114e-02 
+21-07-30 02:47:39.270 - INFO: <epoch:401, iter:  47,400, lr:1.000e-04> l_pix: 2.0401e-02 
+21-07-30 02:48:37.301 - INFO: <epoch:403, iter:  47,600, lr:1.000e-04> l_pix: 2.2198e-02 
+21-07-30 02:49:35.128 - INFO: <epoch:405, iter:  47,800, lr:1.000e-04> l_pix: 1.9229e-02 
+21-07-30 02:50:32.698 - INFO: <epoch:406, iter:  48,000, lr:1.000e-04> l_pix: 2.1090e-02 
+21-07-30 02:50:37.889 - INFO: # Validation # PSNR: 2.7566e+01
+21-07-30 02:50:37.889 - INFO: <epoch:406, iter:  48,000> psnr: 2.7566e+01
+21-07-30 02:50:37.890 - INFO: Saving models and training states.
+21-07-30 02:51:36.354 - INFO: <epoch:408, iter:  48,200, lr:1.000e-04> l_pix: 1.5441e-02 
+21-07-30 02:52:34.422 - INFO: <epoch:410, iter:  48,400, lr:1.000e-04> l_pix: 2.1721e-02 
+21-07-30 02:53:31.958 - INFO: <epoch:411, iter:  48,600, lr:1.000e-04> l_pix: 1.9904e-02 
+21-07-30 02:54:29.501 - INFO: <epoch:413, iter:  48,800, lr:1.000e-04> l_pix: 2.5680e-02 
+21-07-30 02:55:27.388 - INFO: <epoch:415, iter:  49,000, lr:1.000e-04> l_pix: 1.7360e-02 
+21-07-30 02:55:32.545 - INFO: # Validation # PSNR: 2.7222e+01
+21-07-30 02:55:32.545 - INFO: <epoch:415, iter:  49,000> psnr: 2.7222e+01
+21-07-30 02:55:32.545 - INFO: Saving models and training states.
+21-07-30 02:56:30.588 - INFO: <epoch:416, iter:  49,200, lr:1.000e-04> l_pix: 1.8195e-02 
+21-07-30 02:57:28.844 - INFO: <epoch:418, iter:  49,400, lr:1.000e-04> l_pix: 2.2085e-02 
+21-07-30 02:58:26.621 - INFO: <epoch:420, iter:  49,600, lr:1.000e-04> l_pix: 1.9781e-02 
+21-07-30 02:59:24.916 - INFO: <epoch:422, iter:  49,800, lr:1.000e-04> l_pix: 2.2423e-02 
+21-07-30 03:00:22.683 - INFO: <epoch:423, iter:  50,000, lr:1.000e-04> l_pix: 2.1606e-02 
+21-07-30 03:00:27.870 - INFO: # Validation # PSNR: 2.7070e+01
+21-07-30 03:00:27.871 - INFO: <epoch:423, iter:  50,000> psnr: 2.7070e+01
+21-07-30 03:00:27.871 - INFO: Saving models and training states.
+21-07-30 03:01:26.517 - INFO: <epoch:425, iter:  50,200, lr:1.000e-04> l_pix: 2.2679e-02 
+21-07-30 03:02:24.819 - INFO: <epoch:427, iter:  50,400, lr:1.000e-04> l_pix: 1.5562e-02 
+21-07-30 03:03:22.350 - INFO: <epoch:428, iter:  50,600, lr:1.000e-04> l_pix: 2.4568e-02 
+21-07-30 03:04:20.503 - INFO: <epoch:430, iter:  50,800, lr:1.000e-04> l_pix: 1.6119e-02 
+21-07-30 03:05:18.886 - INFO: <epoch:432, iter:  51,000, lr:1.000e-04> l_pix: 1.6748e-02 
+21-07-30 03:05:24.066 - INFO: # Validation # PSNR: 2.7421e+01
+21-07-30 03:05:24.067 - INFO: <epoch:432, iter:  51,000> psnr: 2.7421e+01
+21-07-30 03:05:24.067 - INFO: Saving models and training states.
+21-07-30 03:06:21.994 - INFO: <epoch:433, iter:  51,200, lr:1.000e-04> l_pix: 2.0509e-02 
+21-07-30 03:07:20.401 - INFO: <epoch:435, iter:  51,400, lr:1.000e-04> l_pix: 2.0355e-02 
+21-07-30 03:08:18.441 - INFO: <epoch:437, iter:  51,600, lr:1.000e-04> l_pix: 1.8695e-02 
+21-07-30 03:09:16.258 - INFO: <epoch:438, iter:  51,800, lr:1.000e-04> l_pix: 1.8593e-02 
+21-07-30 03:10:14.362 - INFO: <epoch:440, iter:  52,000, lr:1.000e-04> l_pix: 1.9992e-02 
+21-07-30 03:10:19.544 - INFO: # Validation # PSNR: 2.6706e+01
+21-07-30 03:10:19.544 - INFO: <epoch:440, iter:  52,000> psnr: 2.6706e+01
+21-07-30 03:10:19.545 - INFO: Saving models and training states.
+21-07-30 03:11:18.048 - INFO: <epoch:442, iter:  52,200, lr:1.000e-04> l_pix: 1.6724e-02 
+21-07-30 03:12:16.440 - INFO: <epoch:444, iter:  52,400, lr:1.000e-04> l_pix: 1.4616e-02 
+21-07-30 03:13:13.824 - INFO: <epoch:445, iter:  52,600, lr:1.000e-04> l_pix: 1.8412e-02 
+21-07-30 03:14:11.830 - INFO: <epoch:447, iter:  52,800, lr:1.000e-04> l_pix: 1.6640e-02 
+21-07-30 03:15:09.836 - INFO: <epoch:449, iter:  53,000, lr:1.000e-04> l_pix: 2.1563e-02 
+21-07-30 03:15:14.988 - INFO: # Validation # PSNR: 2.6472e+01
+21-07-30 03:15:14.988 - INFO: <epoch:449, iter:  53,000> psnr: 2.6472e+01
+21-07-30 03:15:14.989 - INFO: Saving models and training states.
+21-07-30 03:16:12.901 - INFO: <epoch:450, iter:  53,200, lr:1.000e-04> l_pix: 1.7925e-02 
+21-07-30 03:17:11.133 - INFO: <epoch:452, iter:  53,400, lr:1.000e-04> l_pix: 1.9311e-02 
+21-07-30 03:18:09.434 - INFO: <epoch:454, iter:  53,600, lr:1.000e-04> l_pix: 1.8311e-02 
+21-07-30 03:19:07.229 - INFO: <epoch:455, iter:  53,800, lr:1.000e-04> l_pix: 1.4244e-02 
+21-07-30 03:20:05.577 - INFO: <epoch:457, iter:  54,000, lr:1.000e-04> l_pix: 1.4612e-02 
+21-07-30 03:20:10.756 - INFO: # Validation # PSNR: 2.6324e+01
+21-07-30 03:20:10.757 - INFO: <epoch:457, iter:  54,000> psnr: 2.6324e+01
+21-07-30 03:20:10.757 - INFO: Saving models and training states.
+21-07-30 03:21:09.102 - INFO: <epoch:459, iter:  54,200, lr:1.000e-04> l_pix: 2.5064e-02 
+21-07-30 03:22:07.191 - INFO: <epoch:461, iter:  54,400, lr:1.000e-04> l_pix: 1.6953e-02 
+21-07-30 03:23:05.050 - INFO: <epoch:462, iter:  54,600, lr:1.000e-04> l_pix: 2.1741e-02 
+21-07-30 03:24:03.160 - INFO: <epoch:464, iter:  54,800, lr:1.000e-04> l_pix: 1.9502e-02 
+21-07-30 03:25:01.534 - INFO: <epoch:466, iter:  55,000, lr:1.000e-04> l_pix: 2.4864e-02 
+21-07-30 03:25:06.736 - INFO: # Validation # PSNR: 2.6341e+01
+21-07-30 03:25:06.737 - INFO: <epoch:466, iter:  55,000> psnr: 2.6341e+01
+21-07-30 03:25:06.737 - INFO: Saving models and training states.
+21-07-30 03:26:04.705 - INFO: <epoch:467, iter:  55,200, lr:1.000e-04> l_pix: 1.7518e-02 
+21-07-30 03:27:03.069 - INFO: <epoch:469, iter:  55,400, lr:1.000e-04> l_pix: 2.2420e-02 
+21-07-30 03:28:01.009 - INFO: <epoch:471, iter:  55,600, lr:1.000e-04> l_pix: 1.9866e-02 
+21-07-30 03:28:58.625 - INFO: <epoch:472, iter:  55,800, lr:1.000e-04> l_pix: 1.9390e-02 
+21-07-30 03:29:56.398 - INFO: <epoch:474, iter:  56,000, lr:1.000e-04> l_pix: 1.4676e-02 
+21-07-30 03:30:01.567 - INFO: # Validation # PSNR: 2.7239e+01
+21-07-30 03:30:01.567 - INFO: <epoch:474, iter:  56,000> psnr: 2.7239e+01
+21-07-30 03:30:01.568 - INFO: Saving models and training states.
+21-07-30 03:31:00.046 - INFO: <epoch:476, iter:  56,200, lr:1.000e-04> l_pix: 1.8207e-02 
+21-07-30 03:31:57.829 - INFO: <epoch:477, iter:  56,400, lr:1.000e-04> l_pix: 2.4705e-02 
+21-07-30 03:32:55.999 - INFO: <epoch:479, iter:  56,600, lr:1.000e-04> l_pix: 1.9620e-02 
+21-07-30 03:33:53.780 - INFO: <epoch:481, iter:  56,800, lr:1.000e-04> l_pix: 1.9021e-02 
+21-07-30 03:34:51.838 - INFO: <epoch:483, iter:  57,000, lr:1.000e-04> l_pix: 2.6257e-02 
+21-07-30 03:34:57.029 - INFO: # Validation # PSNR: 2.6663e+01
+21-07-30 03:34:57.029 - INFO: <epoch:483, iter:  57,000> psnr: 2.6663e+01
+21-07-30 03:34:57.030 - INFO: Saving models and training states.
+21-07-30 03:35:55.006 - INFO: <epoch:484, iter:  57,200, lr:1.000e-04> l_pix: 1.7201e-02 
+21-07-30 03:36:53.349 - INFO: <epoch:486, iter:  57,400, lr:1.000e-04> l_pix: 2.0860e-02 
+21-07-30 03:37:51.388 - INFO: <epoch:488, iter:  57,600, lr:1.000e-04> l_pix: 1.7774e-02 
+21-07-30 03:38:49.238 - INFO: <epoch:489, iter:  57,800, lr:1.000e-04> l_pix: 2.1789e-02 
+21-07-30 03:39:47.746 - INFO: <epoch:491, iter:  58,000, lr:1.000e-04> l_pix: 1.6838e-02 
+21-07-30 03:39:52.949 - INFO: # Validation # PSNR: 2.7044e+01
+21-07-30 03:39:52.949 - INFO: <epoch:491, iter:  58,000> psnr: 2.7044e+01
+21-07-30 03:39:52.950 - INFO: Saving models and training states.
+21-07-30 03:40:51.671 - INFO: <epoch:493, iter:  58,200, lr:1.000e-04> l_pix: 1.8567e-02 
+21-07-30 03:41:49.564 - INFO: <epoch:494, iter:  58,400, lr:1.000e-04> l_pix: 1.9448e-02 
+21-07-30 03:42:47.594 - INFO: <epoch:496, iter:  58,600, lr:1.000e-04> l_pix: 1.4123e-02 
+21-07-30 03:43:45.599 - INFO: <epoch:498, iter:  58,800, lr:1.000e-04> l_pix: 1.9008e-02 
+21-07-30 03:44:43.244 - INFO: <epoch:499, iter:  59,000, lr:1.000e-04> l_pix: 2.2942e-02 
+21-07-30 03:44:48.439 - INFO: # Validation # PSNR: 2.6267e+01
+21-07-30 03:44:48.439 - INFO: <epoch:499, iter:  59,000> psnr: 2.6267e+01
+21-07-30 03:44:48.440 - INFO: Saving models and training states.
+21-07-30 03:45:46.205 - INFO: <epoch:501, iter:  59,200, lr:1.000e-04> l_pix: 2.0504e-02 
+21-07-30 03:46:43.970 - INFO: <epoch:503, iter:  59,400, lr:1.000e-04> l_pix: 1.7748e-02 
+21-07-30 03:47:42.181 - INFO: <epoch:505, iter:  59,600, lr:1.000e-04> l_pix: 2.3485e-02 
+21-07-30 03:48:39.727 - INFO: <epoch:506, iter:  59,800, lr:1.000e-04> l_pix: 1.9964e-02 
+21-07-30 03:49:37.607 - INFO: <epoch:508, iter:  60,000, lr:1.000e-04> l_pix: 2.1192e-02 
+21-07-30 03:49:42.761 - INFO: # Validation # PSNR: 2.6930e+01
+21-07-30 03:49:42.761 - INFO: <epoch:508, iter:  60,000> psnr: 2.6930e+01
+21-07-30 03:49:42.761 - INFO: Saving models and training states.
+21-07-30 03:50:41.150 - INFO: <epoch:510, iter:  60,200, lr:1.000e-04> l_pix: 2.0106e-02 
+21-07-30 03:51:38.694 - INFO: <epoch:511, iter:  60,400, lr:1.000e-04> l_pix: 2.3723e-02 
+21-07-30 03:52:37.053 - INFO: <epoch:513, iter:  60,600, lr:1.000e-04> l_pix: 1.8991e-02 
+21-07-30 03:53:35.205 - INFO: <epoch:515, iter:  60,800, lr:1.000e-04> l_pix: 1.3901e-02 
+21-07-30 03:54:32.661 - INFO: <epoch:516, iter:  61,000, lr:1.000e-04> l_pix: 2.3970e-02 
+21-07-30 03:54:37.815 - INFO: # Validation # PSNR: 2.7137e+01
+21-07-30 03:54:37.816 - INFO: <epoch:516, iter:  61,000> psnr: 2.7137e+01
+21-07-30 03:54:37.816 - INFO: Saving models and training states.
+21-07-30 03:55:36.160 - INFO: <epoch:518, iter:  61,200, lr:1.000e-04> l_pix: 3.1251e-02 
+21-07-30 03:56:34.459 - INFO: <epoch:520, iter:  61,400, lr:1.000e-04> l_pix: 2.4076e-02 
+21-07-30 03:57:32.881 - INFO: <epoch:522, iter:  61,600, lr:1.000e-04> l_pix: 1.6926e-02 
+21-07-30 03:58:30.506 - INFO: <epoch:523, iter:  61,800, lr:1.000e-04> l_pix: 1.6133e-02 
+21-07-30 03:59:28.956 - INFO: <epoch:525, iter:  62,000, lr:1.000e-04> l_pix: 1.8178e-02 
+21-07-30 03:59:34.124 - INFO: # Validation # PSNR: 2.7064e+01
+21-07-30 03:59:34.125 - INFO: <epoch:525, iter:  62,000> psnr: 2.7064e+01
+21-07-30 03:59:34.125 - INFO: Saving models and training states.
+21-07-30 04:00:32.620 - INFO: <epoch:527, iter:  62,200, lr:1.000e-04> l_pix: 1.5004e-02 
+21-07-30 04:01:30.433 - INFO: <epoch:528, iter:  62,400, lr:1.000e-04> l_pix: 2.1899e-02 
+21-07-30 04:02:28.700 - INFO: <epoch:530, iter:  62,600, lr:1.000e-04> l_pix: 2.4570e-02 
+21-07-30 04:03:26.519 - INFO: <epoch:532, iter:  62,800, lr:1.000e-04> l_pix: 1.7683e-02 
+21-07-30 04:04:24.299 - INFO: <epoch:533, iter:  63,000, lr:1.000e-04> l_pix: 2.0312e-02 
+21-07-30 04:04:29.522 - INFO: # Validation # PSNR: 2.6473e+01
+21-07-30 04:04:29.522 - INFO: <epoch:533, iter:  63,000> psnr: 2.6473e+01
+21-07-30 04:04:29.523 - INFO: Saving models and training states.
+21-07-30 04:05:27.816 - INFO: <epoch:535, iter:  63,200, lr:1.000e-04> l_pix: 1.8805e-02 
+21-07-30 04:06:26.147 - INFO: <epoch:537, iter:  63,400, lr:1.000e-04> l_pix: 1.7246e-02 
+21-07-30 04:07:23.104 - INFO: <epoch:538, iter:  63,600, lr:1.000e-04> l_pix: 1.9500e-02 
+21-07-30 04:08:21.193 - INFO: <epoch:540, iter:  63,800, lr:1.000e-04> l_pix: 2.4599e-02 
+21-07-30 04:09:19.019 - INFO: <epoch:542, iter:  64,000, lr:1.000e-04> l_pix: 1.8221e-02 
+21-07-30 04:09:24.179 - INFO: # Validation # PSNR: 2.6878e+01
+21-07-30 04:09:24.180 - INFO: <epoch:542, iter:  64,000> psnr: 2.6878e+01
+21-07-30 04:09:24.180 - INFO: Saving models and training states.
+21-07-30 04:10:22.510 - INFO: <epoch:544, iter:  64,200, lr:1.000e-04> l_pix: 2.0159e-02 
+21-07-30 04:11:20.055 - INFO: <epoch:545, iter:  64,400, lr:1.000e-04> l_pix: 2.0154e-02 
+21-07-30 04:12:18.185 - INFO: <epoch:547, iter:  64,600, lr:1.000e-04> l_pix: 1.8542e-02 
+21-07-30 04:13:16.119 - INFO: <epoch:549, iter:  64,800, lr:1.000e-04> l_pix: 1.6209e-02 
+21-07-30 04:14:13.885 - INFO: <epoch:550, iter:  65,000, lr:1.000e-04> l_pix: 1.8824e-02 
+21-07-30 04:14:19.161 - INFO: # Validation # PSNR: 2.7133e+01
+21-07-30 04:14:19.161 - INFO: <epoch:550, iter:  65,000> psnr: 2.7133e+01
+21-07-30 04:14:19.162 - INFO: Saving models and training states.
+21-07-30 04:16:02.137 - INFO: <epoch:552, iter:  65,200, lr:1.000e-04> l_pix: 2.1575e-02 
+21-07-30 04:17:52.260 - INFO: <epoch:554, iter:  65,400, lr:1.000e-04> l_pix: 2.1154e-02 
+21-07-30 04:19:42.109 - INFO: <epoch:555, iter:  65,600, lr:1.000e-04> l_pix: 2.4051e-02 
+21-07-30 04:21:32.462 - INFO: <epoch:557, iter:  65,800, lr:1.000e-04> l_pix: 1.7677e-02 
+21-07-30 04:23:22.678 - INFO: <epoch:559, iter:  66,000, lr:1.000e-04> l_pix: 1.8505e-02 
+21-07-30 04:23:31.542 - INFO: # Validation # PSNR: 2.7380e+01
+21-07-30 04:23:31.542 - INFO: <epoch:559, iter:  66,000> psnr: 2.7380e+01
+21-07-30 04:23:31.542 - INFO: Saving models and training states.
+21-07-30 04:25:22.205 - INFO: <epoch:561, iter:  66,200, lr:1.000e-04> l_pix: 1.4244e-02 
+21-07-30 04:27:12.048 - INFO: <epoch:562, iter:  66,400, lr:1.000e-04> l_pix: 1.7008e-02 
+21-07-30 04:29:02.350 - INFO: <epoch:564, iter:  66,600, lr:1.000e-04> l_pix: 1.5414e-02 
+21-07-30 04:30:52.660 - INFO: <epoch:566, iter:  66,800, lr:1.000e-04> l_pix: 2.5406e-02 
+21-07-30 04:32:42.356 - INFO: <epoch:567, iter:  67,000, lr:1.000e-04> l_pix: 1.8780e-02 
+21-07-30 04:32:51.208 - INFO: # Validation # PSNR: 2.7661e+01
+21-07-30 04:32:51.208 - INFO: <epoch:567, iter:  67,000> psnr: 2.7661e+01
+21-07-30 04:32:51.209 - INFO: Saving models and training states.
+21-07-30 04:34:41.832 - INFO: <epoch:569, iter:  67,200, lr:1.000e-04> l_pix: 2.1688e-02 
+21-07-30 04:36:32.242 - INFO: <epoch:571, iter:  67,400, lr:1.000e-04> l_pix: 2.2678e-02 
+21-07-30 04:38:22.136 - INFO: <epoch:572, iter:  67,600, lr:1.000e-04> l_pix: 1.5210e-02 
+21-07-30 04:40:12.662 - INFO: <epoch:574, iter:  67,800, lr:1.000e-04> l_pix: 1.8127e-02 
+21-07-30 04:42:03.150 - INFO: <epoch:576, iter:  68,000, lr:1.000e-04> l_pix: 1.6374e-02 
+21-07-30 04:42:12.050 - INFO: # Validation # PSNR: 2.7406e+01
+21-07-30 04:42:12.050 - INFO: <epoch:576, iter:  68,000> psnr: 2.7406e+01
+21-07-30 04:42:12.051 - INFO: Saving models and training states.
+21-07-30 04:44:02.381 - INFO: <epoch:577, iter:  68,200, lr:1.000e-04> l_pix: 1.7258e-02 
+21-07-30 04:45:52.915 - INFO: <epoch:579, iter:  68,400, lr:1.000e-04> l_pix: 1.9995e-02 
+21-07-30 04:47:43.341 - INFO: <epoch:581, iter:  68,600, lr:1.000e-04> l_pix: 2.6048e-02 
+21-07-30 04:49:33.722 - INFO: <epoch:583, iter:  68,800, lr:1.000e-04> l_pix: 1.8541e-02 
+21-07-30 04:51:23.452 - INFO: <epoch:584, iter:  69,000, lr:1.000e-04> l_pix: 1.3417e-02 
+21-07-30 04:51:32.327 - INFO: # Validation # PSNR: 2.8049e+01
+21-07-30 04:51:32.327 - INFO: <epoch:584, iter:  69,000> psnr: 2.8049e+01
+21-07-30 04:51:32.328 - INFO: Saving models and training states.
+21-07-30 04:53:23.180 - INFO: <epoch:586, iter:  69,200, lr:1.000e-04> l_pix: 1.5363e-02 
+21-07-30 04:55:13.613 - INFO: <epoch:588, iter:  69,400, lr:1.000e-04> l_pix: 1.2958e-02 
+21-07-30 04:57:03.666 - INFO: <epoch:589, iter:  69,600, lr:1.000e-04> l_pix: 1.7439e-02 
+21-07-30 04:58:54.190 - INFO: <epoch:591, iter:  69,800, lr:1.000e-04> l_pix: 2.0851e-02 
+21-07-30 05:00:44.753 - INFO: <epoch:593, iter:  70,000, lr:1.000e-04> l_pix: 2.2228e-02 
+21-07-30 05:00:53.631 - INFO: # Validation # PSNR: 2.7468e+01
+21-07-30 05:00:53.631 - INFO: <epoch:593, iter:  70,000> psnr: 2.7468e+01
+21-07-30 05:00:53.631 - INFO: Saving models and training states.
+21-07-30 05:02:43.650 - INFO: <epoch:594, iter:  70,200, lr:1.000e-04> l_pix: 1.6004e-02 
+21-07-30 05:04:33.892 - INFO: <epoch:596, iter:  70,400, lr:1.000e-04> l_pix: 1.6941e-02 
+21-07-30 05:06:24.386 - INFO: <epoch:598, iter:  70,600, lr:1.000e-04> l_pix: 1.9580e-02 
+21-07-30 05:08:14.197 - INFO: <epoch:599, iter:  70,800, lr:1.000e-04> l_pix: 1.3680e-02 
+21-07-30 05:10:04.647 - INFO: <epoch:601, iter:  71,000, lr:1.000e-04> l_pix: 2.2855e-02 
+21-07-30 05:10:13.518 - INFO: # Validation # PSNR: 2.6671e+01
+21-07-30 05:10:13.518 - INFO: <epoch:601, iter:  71,000> psnr: 2.6671e+01
+21-07-30 05:10:13.519 - INFO: Saving models and training states.
+21-07-30 05:12:04.247 - INFO: <epoch:603, iter:  71,200, lr:1.000e-04> l_pix: 1.7966e-02 
+21-07-30 05:13:54.735 - INFO: <epoch:605, iter:  71,400, lr:1.000e-04> l_pix: 2.1810e-02 
+21-07-30 05:15:44.468 - INFO: <epoch:606, iter:  71,600, lr:1.000e-04> l_pix: 2.1689e-02 
+21-07-30 05:17:34.661 - INFO: <epoch:608, iter:  71,800, lr:1.000e-04> l_pix: 2.5986e-02 
+21-07-30 05:19:25.042 - INFO: <epoch:610, iter:  72,000, lr:1.000e-04> l_pix: 2.5631e-02 
+21-07-30 05:19:33.905 - INFO: # Validation # PSNR: 2.7304e+01
+21-07-30 05:19:33.905 - INFO: <epoch:610, iter:  72,000> psnr: 2.7304e+01
+21-07-30 05:19:33.905 - INFO: Saving models and training states.
+21-07-30 05:21:24.081 - INFO: <epoch:611, iter:  72,200, lr:1.000e-04> l_pix: 1.9679e-02 
+21-07-30 05:23:14.281 - INFO: <epoch:613, iter:  72,400, lr:1.000e-04> l_pix: 1.9615e-02 
+21-07-30 05:25:04.551 - INFO: <epoch:615, iter:  72,600, lr:1.000e-04> l_pix: 1.8173e-02 
+21-07-30 05:26:54.291 - INFO: <epoch:616, iter:  72,800, lr:1.000e-04> l_pix: 2.1910e-02 
+21-07-30 05:28:44.532 - INFO: <epoch:618, iter:  73,000, lr:1.000e-04> l_pix: 1.6476e-02 
+21-07-30 05:28:53.433 - INFO: # Validation # PSNR: 2.6354e+01
+21-07-30 05:28:53.434 - INFO: <epoch:618, iter:  73,000> psnr: 2.6354e+01
+21-07-30 05:28:53.434 - INFO: Saving models and training states.
+21-07-30 05:30:43.918 - INFO: <epoch:620, iter:  73,200, lr:1.000e-04> l_pix: 2.4315e-02 
+21-07-30 05:32:34.391 - INFO: <epoch:622, iter:  73,400, lr:1.000e-04> l_pix: 1.7876e-02 
+21-07-30 05:34:24.333 - INFO: <epoch:623, iter:  73,600, lr:1.000e-04> l_pix: 1.8617e-02 
+21-07-30 05:36:14.707 - INFO: <epoch:625, iter:  73,800, lr:1.000e-04> l_pix: 2.4596e-02 
+21-07-30 05:38:05.165 - INFO: <epoch:627, iter:  74,000, lr:1.000e-04> l_pix: 2.4161e-02 
+21-07-30 05:38:14.057 - INFO: # Validation # PSNR: 2.7000e+01
+21-07-30 05:38:14.057 - INFO: <epoch:627, iter:  74,000> psnr: 2.7000e+01
+21-07-30 05:38:14.057 - INFO: Saving models and training states.
+21-07-30 05:40:04.328 - INFO: <epoch:628, iter:  74,200, lr:1.000e-04> l_pix: 2.2154e-02 
+21-07-30 05:41:54.731 - INFO: <epoch:630, iter:  74,400, lr:1.000e-04> l_pix: 2.1339e-02 
+21-07-30 05:43:45.039 - INFO: <epoch:632, iter:  74,600, lr:1.000e-04> l_pix: 2.6547e-02 
+21-07-30 05:45:34.880 - INFO: <epoch:633, iter:  74,800, lr:1.000e-04> l_pix: 1.7009e-02 
+21-07-30 05:47:25.383 - INFO: <epoch:635, iter:  75,000, lr:1.000e-04> l_pix: 1.8183e-02 
+21-07-30 05:47:34.290 - INFO: # Validation # PSNR: 2.7437e+01
+21-07-30 05:47:34.290 - INFO: <epoch:635, iter:  75,000> psnr: 2.7437e+01
+21-07-30 05:47:34.291 - INFO: Saving models and training states.
+21-07-30 05:49:24.936 - INFO: <epoch:637, iter:  75,200, lr:1.000e-04> l_pix: 1.4908e-02 
+21-07-30 05:51:14.967 - INFO: <epoch:638, iter:  75,400, lr:1.000e-04> l_pix: 1.8916e-02 
+21-07-30 05:53:05.387 - INFO: <epoch:640, iter:  75,600, lr:1.000e-04> l_pix: 1.9940e-02 
+21-07-30 05:54:55.675 - INFO: <epoch:642, iter:  75,800, lr:1.000e-04> l_pix: 1.9959e-02 
+21-07-30 05:56:45.984 - INFO: <epoch:644, iter:  76,000, lr:1.000e-04> l_pix: 1.8251e-02 
+21-07-30 05:56:54.856 - INFO: # Validation # PSNR: 2.6534e+01
+21-07-30 05:56:54.857 - INFO: <epoch:644, iter:  76,000> psnr: 2.6534e+01
+21-07-30 05:56:54.857 - INFO: Saving models and training states.
+21-07-30 05:58:45.084 - INFO: <epoch:645, iter:  76,200, lr:1.000e-04> l_pix: 2.5487e-02 
+21-07-30 06:00:35.480 - INFO: <epoch:647, iter:  76,400, lr:1.000e-04> l_pix: 1.9795e-02 
+21-07-30 06:02:25.860 - INFO: <epoch:649, iter:  76,600, lr:1.000e-04> l_pix: 1.9520e-02 
+21-07-30 06:04:15.571 - INFO: <epoch:650, iter:  76,800, lr:1.000e-04> l_pix: 2.3855e-02 
+21-07-30 06:06:05.835 - INFO: <epoch:652, iter:  77,000, lr:1.000e-04> l_pix: 1.8558e-02 
+21-07-30 06:06:14.740 - INFO: # Validation # PSNR: 2.6104e+01
+21-07-30 06:06:14.740 - INFO: <epoch:652, iter:  77,000> psnr: 2.6104e+01
+21-07-30 06:06:14.741 - INFO: Saving models and training states.
+21-07-30 06:08:05.348 - INFO: <epoch:654, iter:  77,200, lr:1.000e-04> l_pix: 1.4844e-02 
+21-07-30 06:09:55.336 - INFO: <epoch:655, iter:  77,400, lr:1.000e-04> l_pix: 1.5431e-02 
+21-07-30 06:11:45.568 - INFO: <epoch:657, iter:  77,600, lr:1.000e-04> l_pix: 1.8239e-02 
+21-07-30 06:13:36.039 - INFO: <epoch:659, iter:  77,800, lr:1.000e-04> l_pix: 2.4139e-02 
+21-07-30 06:15:26.507 - INFO: <epoch:661, iter:  78,000, lr:1.000e-04> l_pix: 1.9857e-02 
+21-07-30 06:15:35.351 - INFO: # Validation # PSNR: 2.7086e+01
+21-07-30 06:15:35.352 - INFO: <epoch:661, iter:  78,000> psnr: 2.7086e+01
+21-07-30 06:15:35.352 - INFO: Saving models and training states.
+21-07-30 06:17:25.414 - INFO: <epoch:662, iter:  78,200, lr:1.000e-04> l_pix: 1.7286e-02 
+21-07-30 06:19:15.584 - INFO: <epoch:664, iter:  78,400, lr:1.000e-04> l_pix: 2.2316e-02 
+21-07-30 06:21:05.915 - INFO: <epoch:666, iter:  78,600, lr:1.000e-04> l_pix: 2.0340e-02 
+21-07-30 06:22:55.825 - INFO: <epoch:667, iter:  78,800, lr:1.000e-04> l_pix: 1.5806e-02 
+21-07-30 06:24:46.066 - INFO: <epoch:669, iter:  79,000, lr:1.000e-04> l_pix: 1.8097e-02 
+21-07-30 06:24:54.973 - INFO: # Validation # PSNR: 2.6710e+01
+21-07-30 06:24:54.973 - INFO: <epoch:669, iter:  79,000> psnr: 2.6710e+01
+21-07-30 06:24:54.974 - INFO: Saving models and training states.
+21-07-30 06:26:45.601 - INFO: <epoch:671, iter:  79,200, lr:1.000e-04> l_pix: 1.6713e-02 
+21-07-30 06:28:35.317 - INFO: <epoch:672, iter:  79,400, lr:1.000e-04> l_pix: 2.2761e-02 
+21-07-30 06:30:25.708 - INFO: <epoch:674, iter:  79,600, lr:1.000e-04> l_pix: 2.0948e-02 
+21-07-30 06:32:16.010 - INFO: <epoch:676, iter:  79,800, lr:1.000e-04> l_pix: 2.4593e-02 
+21-07-30 06:34:05.800 - INFO: <epoch:677, iter:  80,000, lr:1.000e-04> l_pix: 1.3275e-02 
+21-07-30 06:34:14.695 - INFO: # Validation # PSNR: 2.7351e+01
+21-07-30 06:34:14.695 - INFO: <epoch:677, iter:  80,000> psnr: 2.7351e+01
+21-07-30 06:34:14.696 - INFO: Saving models and training states.
+21-07-30 06:36:05.250 - INFO: <epoch:679, iter:  80,200, lr:5.000e-05> l_pix: 2.0281e-02 
+21-07-30 06:37:55.583 - INFO: <epoch:681, iter:  80,400, lr:5.000e-05> l_pix: 1.4192e-02 
+21-07-30 06:39:45.976 - INFO: <epoch:683, iter:  80,600, lr:5.000e-05> l_pix: 2.2200e-02 
+21-07-30 06:41:35.791 - INFO: <epoch:684, iter:  80,800, lr:5.000e-05> l_pix: 1.7472e-02 
+21-07-30 06:43:26.155 - INFO: <epoch:686, iter:  81,000, lr:5.000e-05> l_pix: 2.7184e-02 
+21-07-30 06:43:35.049 - INFO: # Validation # PSNR: 2.6499e+01
+21-07-30 06:43:35.050 - INFO: <epoch:686, iter:  81,000> psnr: 2.6499e+01
+21-07-30 06:43:35.050 - INFO: Saving models and training states.
+21-07-30 06:45:25.518 - INFO: <epoch:688, iter:  81,200, lr:5.000e-05> l_pix: 1.6234e-02 
+21-07-30 06:47:15.312 - INFO: <epoch:689, iter:  81,400, lr:5.000e-05> l_pix: 1.8830e-02 
+21-07-30 06:49:05.600 - INFO: <epoch:691, iter:  81,600, lr:5.000e-05> l_pix: 2.1660e-02 
+21-07-30 06:50:55.741 - INFO: <epoch:693, iter:  81,800, lr:5.000e-05> l_pix: 1.6614e-02 
+21-07-30 06:52:45.414 - INFO: <epoch:694, iter:  82,000, lr:5.000e-05> l_pix: 2.1739e-02 
+21-07-30 06:52:54.259 - INFO: # Validation # PSNR: 2.7514e+01
+21-07-30 06:52:54.259 - INFO: <epoch:694, iter:  82,000> psnr: 2.7514e+01
+21-07-30 06:52:54.260 - INFO: Saving models and training states.
+21-07-30 06:54:44.747 - INFO: <epoch:696, iter:  82,200, lr:5.000e-05> l_pix: 2.6944e-02 
+21-07-30 06:56:35.132 - INFO: <epoch:698, iter:  82,400, lr:5.000e-05> l_pix: 2.1293e-02 
+21-07-30 06:58:24.665 - INFO: <epoch:699, iter:  82,600, lr:5.000e-05> l_pix: 1.8442e-02 
+21-07-30 07:00:15.075 - INFO: <epoch:701, iter:  82,800, lr:5.000e-05> l_pix: 2.3000e-02 
+21-07-30 07:02:05.479 - INFO: <epoch:703, iter:  83,000, lr:5.000e-05> l_pix: 2.1154e-02 
+21-07-30 07:02:14.332 - INFO: # Validation # PSNR: 2.8201e+01
+21-07-30 07:02:14.332 - INFO: <epoch:703, iter:  83,000> psnr: 2.8201e+01
+21-07-30 07:02:14.333 - INFO: Saving models and training states.
+21-07-30 07:04:04.838 - INFO: <epoch:705, iter:  83,200, lr:5.000e-05> l_pix: 1.8386e-02 
+21-07-30 07:05:54.653 - INFO: <epoch:706, iter:  83,400, lr:5.000e-05> l_pix: 2.7779e-02 
+21-07-30 07:07:44.990 - INFO: <epoch:708, iter:  83,600, lr:5.000e-05> l_pix: 1.7276e-02 
+21-07-30 07:09:35.366 - INFO: <epoch:710, iter:  83,800, lr:5.000e-05> l_pix: 1.6853e-02 
+21-07-30 07:11:25.146 - INFO: <epoch:711, iter:  84,000, lr:5.000e-05> l_pix: 2.6282e-02 
+21-07-30 07:11:34.018 - INFO: # Validation # PSNR: 2.7315e+01
+21-07-30 07:11:34.018 - INFO: <epoch:711, iter:  84,000> psnr: 2.7315e+01
+21-07-30 07:11:34.019 - INFO: Saving models and training states.
+21-07-30 07:13:24.613 - INFO: <epoch:713, iter:  84,200, lr:5.000e-05> l_pix: 1.9552e-02 
+21-07-30 07:15:15.062 - INFO: <epoch:715, iter:  84,400, lr:5.000e-05> l_pix: 2.6106e-02 
+21-07-30 07:17:04.994 - INFO: <epoch:716, iter:  84,600, lr:5.000e-05> l_pix: 1.9379e-02 
+21-07-30 07:18:55.309 - INFO: <epoch:718, iter:  84,800, lr:5.000e-05> l_pix: 1.4517e-02 
+21-07-30 07:20:45.545 - INFO: <epoch:720, iter:  85,000, lr:5.000e-05> l_pix: 1.6862e-02 
+21-07-30 07:20:54.412 - INFO: # Validation # PSNR: 2.7328e+01
+21-07-30 07:20:54.413 - INFO: <epoch:720, iter:  85,000> psnr: 2.7328e+01
+21-07-30 07:20:54.413 - INFO: Saving models and training states.
+21-07-30 07:22:45.070 - INFO: <epoch:722, iter:  85,200, lr:5.000e-05> l_pix: 2.1406e-02 
+21-07-30 07:24:34.877 - INFO: <epoch:723, iter:  85,400, lr:5.000e-05> l_pix: 1.5904e-02 
+21-07-30 07:26:25.328 - INFO: <epoch:725, iter:  85,600, lr:5.000e-05> l_pix: 2.2301e-02 
+21-07-30 07:28:15.606 - INFO: <epoch:727, iter:  85,800, lr:5.000e-05> l_pix: 1.9621e-02 
+21-07-30 07:30:05.533 - INFO: <epoch:728, iter:  86,000, lr:5.000e-05> l_pix: 2.0294e-02 
+21-07-30 07:30:14.408 - INFO: # Validation # PSNR: 2.7705e+01
+21-07-30 07:30:14.409 - INFO: <epoch:728, iter:  86,000> psnr: 2.7705e+01
+21-07-30 07:30:14.409 - INFO: Saving models and training states.
+21-07-30 07:32:05.066 - INFO: <epoch:730, iter:  86,200, lr:5.000e-05> l_pix: 1.8027e-02 
+21-07-30 07:33:55.182 - INFO: <epoch:732, iter:  86,400, lr:5.000e-05> l_pix: 2.2611e-02 
+21-07-30 07:35:45.024 - INFO: <epoch:733, iter:  86,600, lr:5.000e-05> l_pix: 1.6515e-02 
+21-07-30 07:37:35.453 - INFO: <epoch:735, iter:  86,800, lr:5.000e-05> l_pix: 1.8024e-02 
+21-07-30 07:39:25.794 - INFO: <epoch:737, iter:  87,000, lr:5.000e-05> l_pix: 2.4188e-02 
+21-07-30 07:39:34.681 - INFO: # Validation # PSNR: 2.7653e+01
+21-07-30 07:39:34.681 - INFO: <epoch:737, iter:  87,000> psnr: 2.7653e+01
+21-07-30 07:39:34.682 - INFO: Saving models and training states.
+21-07-30 07:41:24.687 - INFO: <epoch:738, iter:  87,200, lr:5.000e-05> l_pix: 1.4698e-02 
+21-07-30 07:43:14.886 - INFO: <epoch:740, iter:  87,400, lr:5.000e-05> l_pix: 1.9278e-02 
+21-07-30 07:45:05.136 - INFO: <epoch:742, iter:  87,600, lr:5.000e-05> l_pix: 2.8260e-02 
+21-07-30 07:46:55.169 - INFO: <epoch:744, iter:  87,800, lr:5.000e-05> l_pix: 2.1431e-02 
+21-07-30 07:48:44.978 - INFO: <epoch:745, iter:  88,000, lr:5.000e-05> l_pix: 1.4624e-02 
+21-07-30 07:48:53.835 - INFO: # Validation # PSNR: 2.7105e+01
+21-07-30 07:48:53.835 - INFO: <epoch:745, iter:  88,000> psnr: 2.7105e+01
+21-07-30 07:48:53.836 - INFO: Saving models and training states.
+21-07-30 07:50:44.335 - INFO: <epoch:747, iter:  88,200, lr:5.000e-05> l_pix: 1.4776e-02 
+21-07-30 07:52:34.425 - INFO: <epoch:749, iter:  88,400, lr:5.000e-05> l_pix: 2.4859e-02 
+21-07-30 07:54:24.304 - INFO: <epoch:750, iter:  88,600, lr:5.000e-05> l_pix: 1.7004e-02 
+21-07-30 07:56:14.641 - INFO: <epoch:752, iter:  88,800, lr:5.000e-05> l_pix: 2.6457e-02 
+21-07-30 07:58:04.957 - INFO: <epoch:754, iter:  89,000, lr:5.000e-05> l_pix: 1.5974e-02 
+21-07-30 07:58:13.839 - INFO: # Validation # PSNR: 2.6667e+01
+21-07-30 07:58:13.839 - INFO: <epoch:754, iter:  89,000> psnr: 2.6667e+01
+21-07-30 07:58:13.840 - INFO: Saving models and training states.
+21-07-30 08:00:03.966 - INFO: <epoch:755, iter:  89,200, lr:5.000e-05> l_pix: 2.9299e-02 
+21-07-30 08:01:54.244 - INFO: <epoch:757, iter:  89,400, lr:5.000e-05> l_pix: 2.1357e-02 
+21-07-30 08:03:44.484 - INFO: <epoch:759, iter:  89,600, lr:5.000e-05> l_pix: 1.8976e-02 
+21-07-30 08:05:34.854 - INFO: <epoch:761, iter:  89,800, lr:5.000e-05> l_pix: 1.7224e-02 
+21-07-30 08:07:24.860 - INFO: <epoch:762, iter:  90,000, lr:5.000e-05> l_pix: 2.4085e-02 
+21-07-30 08:07:33.729 - INFO: # Validation # PSNR: 2.7277e+01
+21-07-30 08:07:33.729 - INFO: <epoch:762, iter:  90,000> psnr: 2.7277e+01
+21-07-30 08:07:33.729 - INFO: Saving models and training states.
+21-07-30 08:09:24.330 - INFO: <epoch:764, iter:  90,200, lr:5.000e-05> l_pix: 2.1755e-02 
+21-07-30 08:11:14.707 - INFO: <epoch:766, iter:  90,400, lr:5.000e-05> l_pix: 1.4491e-02 
+21-07-30 08:13:04.773 - INFO: <epoch:767, iter:  90,600, lr:5.000e-05> l_pix: 2.1403e-02 
+21-07-30 08:14:54.866 - INFO: <epoch:769, iter:  90,800, lr:5.000e-05> l_pix: 1.9718e-02 
+21-07-30 08:16:45.147 - INFO: <epoch:771, iter:  91,000, lr:5.000e-05> l_pix: 1.4874e-02 
+21-07-30 08:16:53.994 - INFO: # Validation # PSNR: 2.7008e+01
+21-07-30 08:16:53.995 - INFO: <epoch:771, iter:  91,000> psnr: 2.7008e+01
+21-07-30 08:16:53.995 - INFO: Saving models and training states.
+21-07-30 08:18:44.015 - INFO: <epoch:772, iter:  91,200, lr:5.000e-05> l_pix: 2.2438e-02 
+21-07-30 08:20:34.302 - INFO: <epoch:774, iter:  91,400, lr:5.000e-05> l_pix: 1.8941e-02 
+21-07-30 08:22:24.609 - INFO: <epoch:776, iter:  91,600, lr:5.000e-05> l_pix: 2.1736e-02 
+21-07-30 08:24:15.111 - INFO: <epoch:777, iter:  91,800, lr:5.000e-05> l_pix: 2.1672e-02 
+21-07-30 08:26:05.908 - INFO: <epoch:779, iter:  92,000, lr:5.000e-05> l_pix: 1.6146e-02 
+21-07-30 08:26:14.768 - INFO: # Validation # PSNR: 2.7120e+01
+21-07-30 08:26:14.769 - INFO: <epoch:779, iter:  92,000> psnr: 2.7120e+01
+21-07-30 08:26:14.769 - INFO: Saving models and training states.
+21-07-30 08:28:05.173 - INFO: <epoch:781, iter:  92,200, lr:5.000e-05> l_pix: 1.1921e-02 
+21-07-30 08:29:56.041 - INFO: <epoch:783, iter:  92,400, lr:5.000e-05> l_pix: 1.6238e-02 
+21-07-30 08:31:45.916 - INFO: <epoch:784, iter:  92,600, lr:5.000e-05> l_pix: 2.2990e-02 
+21-07-30 08:33:36.249 - INFO: <epoch:786, iter:  92,800, lr:5.000e-05> l_pix: 1.4514e-02 
+21-07-30 08:35:26.543 - INFO: <epoch:788, iter:  93,000, lr:5.000e-05> l_pix: 2.4776e-02 
+21-07-30 08:35:35.439 - INFO: # Validation # PSNR: 2.6416e+01
+21-07-30 08:35:35.439 - INFO: <epoch:788, iter:  93,000> psnr: 2.6416e+01
+21-07-30 08:35:35.440 - INFO: Saving models and training states.
+21-07-30 08:37:25.453 - INFO: <epoch:789, iter:  93,200, lr:5.000e-05> l_pix: 1.4960e-02 
+21-07-30 08:39:16.246 - INFO: <epoch:791, iter:  93,400, lr:5.000e-05> l_pix: 2.7110e-02 
+21-07-30 08:41:06.494 - INFO: <epoch:793, iter:  93,600, lr:5.000e-05> l_pix: 2.0501e-02 
+21-07-30 08:42:56.163 - INFO: <epoch:794, iter:  93,800, lr:5.000e-05> l_pix: 1.9914e-02 
+21-07-30 08:44:46.989 - INFO: <epoch:796, iter:  94,000, lr:5.000e-05> l_pix: 1.7350e-02 
+21-07-30 08:44:55.926 - INFO: # Validation # PSNR: 2.7698e+01
+21-07-30 08:44:55.926 - INFO: <epoch:796, iter:  94,000> psnr: 2.7698e+01
+21-07-30 08:44:55.926 - INFO: Saving models and training states.
+21-07-30 08:46:46.537 - INFO: <epoch:798, iter:  94,200, lr:5.000e-05> l_pix: 1.7255e-02 
+21-07-30 08:48:36.431 - INFO: <epoch:799, iter:  94,400, lr:5.000e-05> l_pix: 2.0152e-02 
+21-07-30 08:50:26.633 - INFO: <epoch:801, iter:  94,600, lr:5.000e-05> l_pix: 1.6547e-02 
+21-07-30 08:52:16.983 - INFO: <epoch:803, iter:  94,800, lr:5.000e-05> l_pix: 1.9540e-02 
+21-07-30 08:54:14.607 - INFO: <epoch:805, iter:  95,000, lr:5.000e-05> l_pix: 1.7050e-02 
+21-07-30 08:54:24.030 - INFO: # Validation # PSNR: 2.7938e+01
+21-07-30 08:54:24.030 - INFO: <epoch:805, iter:  95,000> psnr: 2.7938e+01
+21-07-30 08:54:24.031 - INFO: Saving models and training states.
+21-07-30 08:56:21.758 - INFO: <epoch:806, iter:  95,200, lr:5.000e-05> l_pix: 1.6499e-02 
+21-07-30 08:58:20.146 - INFO: <epoch:808, iter:  95,400, lr:5.000e-05> l_pix: 2.0371e-02 
+21-07-30 09:00:18.578 - INFO: <epoch:810, iter:  95,600, lr:5.000e-05> l_pix: 2.3083e-02 
+21-07-30 09:02:08.876 - INFO: <epoch:811, iter:  95,800, lr:5.000e-05> l_pix: 2.1817e-02 
+21-07-30 09:03:59.276 - INFO: <epoch:813, iter:  96,000, lr:5.000e-05> l_pix: 2.2470e-02 
+21-07-30 09:04:08.155 - INFO: # Validation # PSNR: 2.7444e+01
+21-07-30 09:04:08.156 - INFO: <epoch:813, iter:  96,000> psnr: 2.7444e+01
+21-07-30 09:04:08.156 - INFO: Saving models and training states.
+21-07-30 09:05:58.852 - INFO: <epoch:815, iter:  96,200, lr:5.000e-05> l_pix: 1.4025e-02 
+21-07-30 09:07:48.643 - INFO: <epoch:816, iter:  96,400, lr:5.000e-05> l_pix: 1.9419e-02 
+21-07-30 09:09:38.876 - INFO: <epoch:818, iter:  96,600, lr:5.000e-05> l_pix: 1.4039e-02 
+21-07-30 09:11:29.184 - INFO: <epoch:820, iter:  96,800, lr:5.000e-05> l_pix: 1.7202e-02 
+21-07-30 09:13:19.200 - INFO: <epoch:822, iter:  97,000, lr:5.000e-05> l_pix: 1.9088e-02 
+21-07-30 09:13:28.070 - INFO: # Validation # PSNR: 2.7797e+01
+21-07-30 09:13:28.070 - INFO: <epoch:822, iter:  97,000> psnr: 2.7797e+01
+21-07-30 09:13:28.071 - INFO: Saving models and training states.
+21-07-30 09:15:18.083 - INFO: <epoch:823, iter:  97,200, lr:5.000e-05> l_pix: 1.8574e-02 
+21-07-30 09:17:08.329 - INFO: <epoch:825, iter:  97,400, lr:5.000e-05> l_pix: 1.7115e-02 
+21-07-30 09:18:58.644 - INFO: <epoch:827, iter:  97,600, lr:5.000e-05> l_pix: 1.8628e-02 
+21-07-30 09:20:48.446 - INFO: <epoch:828, iter:  97,800, lr:5.000e-05> l_pix: 2.2706e-02 
+21-07-30 09:22:38.772 - INFO: <epoch:830, iter:  98,000, lr:5.000e-05> l_pix: 1.7620e-02 
+21-07-30 09:22:47.631 - INFO: # Validation # PSNR: 2.7273e+01
+21-07-30 09:22:47.632 - INFO: <epoch:830, iter:  98,000> psnr: 2.7273e+01
+21-07-30 09:22:47.632 - INFO: Saving models and training states.
+21-07-30 09:24:38.256 - INFO: <epoch:832, iter:  98,200, lr:5.000e-05> l_pix: 1.6217e-02 
+21-07-30 09:26:28.018 - INFO: <epoch:833, iter:  98,400, lr:5.000e-05> l_pix: 2.2038e-02 
+21-07-30 09:28:18.421 - INFO: <epoch:835, iter:  98,600, lr:5.000e-05> l_pix: 1.8736e-02 
+21-07-30 09:30:08.807 - INFO: <epoch:837, iter:  98,800, lr:5.000e-05> l_pix: 1.8266e-02 
+21-07-30 09:31:58.612 - INFO: <epoch:838, iter:  99,000, lr:5.000e-05> l_pix: 1.5260e-02 
+21-07-30 09:32:07.487 - INFO: # Validation # PSNR: 2.7967e+01
+21-07-30 09:32:07.487 - INFO: <epoch:838, iter:  99,000> psnr: 2.7967e+01
+21-07-30 09:32:07.488 - INFO: Saving models and training states.
+21-07-30 09:33:57.964 - INFO: <epoch:840, iter:  99,200, lr:5.000e-05> l_pix: 2.0402e-02 
+21-07-30 09:35:48.341 - INFO: <epoch:842, iter:  99,400, lr:5.000e-05> l_pix: 2.6405e-02 
+21-07-30 09:37:38.674 - INFO: <epoch:844, iter:  99,600, lr:5.000e-05> l_pix: 1.9206e-02 
+21-07-30 09:39:28.591 - INFO: <epoch:845, iter:  99,800, lr:5.000e-05> l_pix: 1.5871e-02 
+21-07-30 09:41:18.946 - INFO: <epoch:847, iter: 100,000, lr:5.000e-05> l_pix: 2.2608e-02 
+21-07-30 09:41:27.811 - INFO: # Validation # PSNR: 2.7694e+01
+21-07-30 09:41:27.811 - INFO: <epoch:847, iter: 100,000> psnr: 2.7694e+01
+21-07-30 09:41:27.812 - INFO: Saving models and training states.
+21-07-30 09:43:18.383 - INFO: <epoch:849, iter: 100,200, lr:5.000e-05> l_pix: 1.7759e-02 
+21-07-30 09:45:08.205 - INFO: <epoch:850, iter: 100,400, lr:5.000e-05> l_pix: 1.6787e-02 
+21-07-30 09:46:58.551 - INFO: <epoch:852, iter: 100,600, lr:5.000e-05> l_pix: 1.8722e-02 
+21-07-30 09:48:48.700 - INFO: <epoch:854, iter: 100,800, lr:5.000e-05> l_pix: 1.7798e-02 
+21-07-30 09:50:38.421 - INFO: <epoch:855, iter: 101,000, lr:5.000e-05> l_pix: 2.3778e-02 
+21-07-30 09:50:47.266 - INFO: # Validation # PSNR: 2.7273e+01
+21-07-30 09:50:47.266 - INFO: <epoch:855, iter: 101,000> psnr: 2.7273e+01
+21-07-30 09:50:47.267 - INFO: Saving models and training states.
+21-07-30 09:52:37.789 - INFO: <epoch:857, iter: 101,200, lr:5.000e-05> l_pix: 2.1140e-02 
+21-07-30 09:54:28.136 - INFO: <epoch:859, iter: 101,400, lr:5.000e-05> l_pix: 1.8562e-02 
+21-07-30 09:56:18.592 - INFO: <epoch:861, iter: 101,600, lr:5.000e-05> l_pix: 2.0530e-02 
+21-07-30 09:58:08.488 - INFO: <epoch:862, iter: 101,800, lr:5.000e-05> l_pix: 1.3729e-02 
+21-07-30 09:59:59.040 - INFO: <epoch:864, iter: 102,000, lr:5.000e-05> l_pix: 2.0162e-02 
+21-07-30 10:00:07.910 - INFO: # Validation # PSNR: 2.7676e+01
+21-07-30 10:00:07.910 - INFO: <epoch:864, iter: 102,000> psnr: 2.7676e+01
+21-07-30 10:00:07.910 - INFO: Saving models and training states.
+21-07-30 10:01:58.630 - INFO: <epoch:866, iter: 102,200, lr:5.000e-05> l_pix: 1.9672e-02 
+21-07-30 10:03:48.543 - INFO: <epoch:867, iter: 102,400, lr:5.000e-05> l_pix: 2.3245e-02 
+21-07-30 10:05:38.990 - INFO: <epoch:869, iter: 102,600, lr:5.000e-05> l_pix: 2.1251e-02 
+21-07-30 10:07:29.159 - INFO: <epoch:871, iter: 102,800, lr:5.000e-05> l_pix: 2.6644e-02 
+21-07-30 10:09:18.934 - INFO: <epoch:872, iter: 103,000, lr:5.000e-05> l_pix: 2.3952e-02 
+21-07-30 10:09:27.825 - INFO: # Validation # PSNR: 2.6783e+01
+21-07-30 10:09:27.825 - INFO: <epoch:872, iter: 103,000> psnr: 2.6783e+01
+21-07-30 10:09:27.826 - INFO: Saving models and training states.
+21-07-30 10:11:18.629 - INFO: <epoch:874, iter: 103,200, lr:5.000e-05> l_pix: 1.4447e-02 
+21-07-30 10:13:08.812 - INFO: <epoch:876, iter: 103,400, lr:5.000e-05> l_pix: 1.7782e-02 
+21-07-30 10:14:58.719 - INFO: <epoch:877, iter: 103,600, lr:5.000e-05> l_pix: 1.8556e-02 
+21-07-30 10:16:49.044 - INFO: <epoch:879, iter: 103,800, lr:5.000e-05> l_pix: 1.8568e-02 
+21-07-30 10:18:39.433 - INFO: <epoch:881, iter: 104,000, lr:5.000e-05> l_pix: 1.8078e-02 
+21-07-30 10:18:48.487 - INFO: # Validation # PSNR: 2.6826e+01
+21-07-30 10:18:48.487 - INFO: <epoch:881, iter: 104,000> psnr: 2.6826e+01
+21-07-30 10:18:48.487 - INFO: Saving models and training states.
+21-07-30 10:20:39.282 - INFO: <epoch:883, iter: 104,200, lr:5.000e-05> l_pix: 1.4142e-02 
+21-07-30 10:22:29.273 - INFO: <epoch:884, iter: 104,400, lr:5.000e-05> l_pix: 1.7317e-02 
+21-07-30 10:24:19.446 - INFO: <epoch:886, iter: 104,600, lr:5.000e-05> l_pix: 1.9018e-02 
+21-07-30 10:26:09.918 - INFO: <epoch:888, iter: 104,800, lr:5.000e-05> l_pix: 1.6887e-02 
+21-07-30 10:27:59.828 - INFO: <epoch:889, iter: 105,000, lr:5.000e-05> l_pix: 2.2499e-02 
+21-07-30 10:28:08.711 - INFO: # Validation # PSNR: 2.7679e+01
+21-07-30 10:28:08.711 - INFO: <epoch:889, iter: 105,000> psnr: 2.7679e+01
+21-07-30 10:28:08.712 - INFO: Saving models and training states.
+21-07-30 10:29:59.336 - INFO: <epoch:891, iter: 105,200, lr:5.000e-05> l_pix: 1.5253e-02 
+21-07-30 10:31:49.685 - INFO: <epoch:893, iter: 105,400, lr:5.000e-05> l_pix: 1.7589e-02 
+21-07-30 10:33:39.718 - INFO: <epoch:894, iter: 105,600, lr:5.000e-05> l_pix: 1.8844e-02 
+21-07-30 10:35:30.260 - INFO: <epoch:896, iter: 105,800, lr:5.000e-05> l_pix: 1.8720e-02 
+21-07-30 10:37:20.530 - INFO: <epoch:898, iter: 106,000, lr:5.000e-05> l_pix: 2.7968e-02 
+21-07-30 10:37:29.370 - INFO: # Validation # PSNR: 2.6932e+01
+21-07-30 10:37:29.370 - INFO: <epoch:898, iter: 106,000> psnr: 2.6932e+01
+21-07-30 10:37:29.370 - INFO: Saving models and training states.
+21-07-30 10:39:19.379 - INFO: <epoch:899, iter: 106,200, lr:5.000e-05> l_pix: 2.1109e-02 
+21-07-30 10:41:09.569 - INFO: <epoch:901, iter: 106,400, lr:5.000e-05> l_pix: 1.8580e-02 
+21-07-30 10:42:59.813 - INFO: <epoch:903, iter: 106,600, lr:5.000e-05> l_pix: 2.3474e-02 
+21-07-30 10:44:50.167 - INFO: <epoch:905, iter: 106,800, lr:5.000e-05> l_pix: 1.6104e-02 
+21-07-30 10:46:39.980 - INFO: <epoch:906, iter: 107,000, lr:5.000e-05> l_pix: 1.5300e-02 
+21-07-30 10:46:48.866 - INFO: # Validation # PSNR: 2.7353e+01
+21-07-30 10:46:48.866 - INFO: <epoch:906, iter: 107,000> psnr: 2.7353e+01
+21-07-30 10:46:48.866 - INFO: Saving models and training states.
+21-07-30 10:48:39.526 - INFO: <epoch:908, iter: 107,200, lr:5.000e-05> l_pix: 2.5188e-02 
+21-07-30 10:50:29.903 - INFO: <epoch:910, iter: 107,400, lr:5.000e-05> l_pix: 1.8908e-02 
+21-07-30 10:52:19.940 - INFO: <epoch:911, iter: 107,600, lr:5.000e-05> l_pix: 1.5965e-02 
+21-07-30 10:54:10.232 - INFO: <epoch:913, iter: 107,800, lr:5.000e-05> l_pix: 2.2782e-02 
+21-07-30 10:56:00.522 - INFO: <epoch:915, iter: 108,000, lr:5.000e-05> l_pix: 1.7953e-02 
+21-07-30 10:56:09.400 - INFO: # Validation # PSNR: 2.8328e+01
+21-07-30 10:56:09.400 - INFO: <epoch:915, iter: 108,000> psnr: 2.8328e+01
+21-07-30 10:56:09.401 - INFO: Saving models and training states.
+21-07-30 10:57:59.510 - INFO: <epoch:916, iter: 108,200, lr:5.000e-05> l_pix: 1.8580e-02 
+21-07-30 10:59:49.900 - INFO: <epoch:918, iter: 108,400, lr:5.000e-05> l_pix: 2.1913e-02 
+21-07-30 11:01:40.134 - INFO: <epoch:920, iter: 108,600, lr:5.000e-05> l_pix: 1.5359e-02 
+21-07-30 11:03:30.451 - INFO: <epoch:922, iter: 108,800, lr:5.000e-05> l_pix: 2.5326e-02 
+21-07-30 11:05:20.224 - INFO: <epoch:923, iter: 109,000, lr:5.000e-05> l_pix: 1.8397e-02 
+21-07-30 11:05:29.109 - INFO: # Validation # PSNR: 2.7644e+01
+21-07-30 11:05:29.110 - INFO: <epoch:923, iter: 109,000> psnr: 2.7644e+01
+21-07-30 11:05:29.110 - INFO: Saving models and training states.
+21-07-30 11:07:19.627 - INFO: <epoch:925, iter: 109,200, lr:5.000e-05> l_pix: 2.3003e-02 
+21-07-30 11:09:09.953 - INFO: <epoch:927, iter: 109,400, lr:5.000e-05> l_pix: 2.3721e-02 
+21-07-30 11:10:59.938 - INFO: <epoch:928, iter: 109,600, lr:5.000e-05> l_pix: 1.7834e-02 
+21-07-30 11:12:50.310 - INFO: <epoch:930, iter: 109,800, lr:5.000e-05> l_pix: 2.4543e-02 
+21-07-30 11:14:40.796 - INFO: <epoch:932, iter: 110,000, lr:5.000e-05> l_pix: 2.3472e-02 
+21-07-30 11:14:49.666 - INFO: # Validation # PSNR: 2.7724e+01
+21-07-30 11:14:49.667 - INFO: <epoch:932, iter: 110,000> psnr: 2.7724e+01
+21-07-30 11:14:49.667 - INFO: Saving models and training states.
+21-07-30 11:16:39.768 - INFO: <epoch:933, iter: 110,200, lr:5.000e-05> l_pix: 2.1146e-02 
+21-07-30 11:18:29.946 - INFO: <epoch:935, iter: 110,400, lr:5.000e-05> l_pix: 1.8070e-02 
+21-07-30 11:20:20.282 - INFO: <epoch:937, iter: 110,600, lr:5.000e-05> l_pix: 2.7284e-02 
+21-07-30 11:22:10.083 - INFO: <epoch:938, iter: 110,800, lr:5.000e-05> l_pix: 2.0716e-02 
+21-07-30 11:24:00.474 - INFO: <epoch:940, iter: 111,000, lr:5.000e-05> l_pix: 2.4329e-02 
+21-07-30 11:24:09.332 - INFO: # Validation # PSNR: 2.7732e+01
+21-07-30 11:24:09.332 - INFO: <epoch:940, iter: 111,000> psnr: 2.7732e+01
+21-07-30 11:24:09.332 - INFO: Saving models and training states.
+21-07-30 11:26:00.018 - INFO: <epoch:942, iter: 111,200, lr:5.000e-05> l_pix: 1.7025e-02 
+21-07-30 11:27:50.284 - INFO: <epoch:944, iter: 111,400, lr:5.000e-05> l_pix: 2.1925e-02 
+21-07-30 11:29:40.259 - INFO: <epoch:945, iter: 111,600, lr:5.000e-05> l_pix: 1.5971e-02 
+21-07-30 11:31:30.573 - INFO: <epoch:947, iter: 111,800, lr:5.000e-05> l_pix: 1.8991e-02 
+21-07-30 11:33:20.900 - INFO: <epoch:949, iter: 112,000, lr:5.000e-05> l_pix: 2.0159e-02 
+21-07-30 11:33:29.797 - INFO: # Validation # PSNR: 2.7910e+01
+21-07-30 11:33:29.798 - INFO: <epoch:949, iter: 112,000> psnr: 2.7910e+01
+21-07-30 11:33:29.798 - INFO: Saving models and training states.
+21-07-30 11:35:20.165 - INFO: <epoch:950, iter: 112,200, lr:5.000e-05> l_pix: 1.7686e-02 
+21-07-30 11:37:10.717 - INFO: <epoch:952, iter: 112,400, lr:5.000e-05> l_pix: 2.0865e-02 
+21-07-30 11:39:01.136 - INFO: <epoch:954, iter: 112,600, lr:5.000e-05> l_pix: 2.0981e-02 
+21-07-30 11:40:51.103 - INFO: <epoch:955, iter: 112,800, lr:5.000e-05> l_pix: 2.1082e-02 
+21-07-30 11:42:41.641 - INFO: <epoch:957, iter: 113,000, lr:5.000e-05> l_pix: 2.3644e-02 
+21-07-30 11:42:50.529 - INFO: # Validation # PSNR: 2.7114e+01
+21-07-30 11:42:50.529 - INFO: <epoch:957, iter: 113,000> psnr: 2.7114e+01
+21-07-30 11:42:50.530 - INFO: Saving models and training states.
+21-07-30 11:44:42.588 - INFO: <epoch:959, iter: 113,200, lr:5.000e-05> l_pix: 1.5771e-02 
+21-07-30 11:46:34.263 - INFO: <epoch:961, iter: 113,400, lr:5.000e-05> l_pix: 1.7679e-02 
+21-07-30 11:48:24.789 - INFO: <epoch:962, iter: 113,600, lr:5.000e-05> l_pix: 2.1046e-02 
+21-07-30 11:50:14.921 - INFO: <epoch:964, iter: 113,800, lr:5.000e-05> l_pix: 1.3561e-02 
+21-07-30 11:52:05.681 - INFO: <epoch:966, iter: 114,000, lr:5.000e-05> l_pix: 2.2387e-02 
+21-07-30 11:52:14.636 - INFO: # Validation # PSNR: 2.7460e+01
+21-07-30 11:52:14.636 - INFO: <epoch:966, iter: 114,000> psnr: 2.7460e+01
+21-07-30 11:52:14.637 - INFO: Saving models and training states.
+21-07-30 11:54:06.798 - INFO: <epoch:967, iter: 114,200, lr:5.000e-05> l_pix: 1.5582e-02 
+21-07-30 11:55:57.619 - INFO: <epoch:969, iter: 114,400, lr:5.000e-05> l_pix: 2.0493e-02 
+21-07-30 11:57:48.124 - INFO: <epoch:971, iter: 114,600, lr:5.000e-05> l_pix: 1.8145e-02 
+21-07-30 11:59:38.553 - INFO: <epoch:972, iter: 114,800, lr:5.000e-05> l_pix: 1.8569e-02 
+21-07-30 12:01:29.075 - INFO: <epoch:974, iter: 115,000, lr:5.000e-05> l_pix: 1.3851e-02 
+21-07-30 12:01:37.962 - INFO: # Validation # PSNR: 2.7586e+01
+21-07-30 12:01:37.962 - INFO: <epoch:974, iter: 115,000> psnr: 2.7586e+01
+21-07-30 12:01:37.963 - INFO: Saving models and training states.
+21-07-30 12:03:29.077 - INFO: <epoch:976, iter: 115,200, lr:5.000e-05> l_pix: 2.6234e-02 
+21-07-30 12:05:19.499 - INFO: <epoch:977, iter: 115,400, lr:5.000e-05> l_pix: 1.7170e-02 
+21-07-30 12:07:10.185 - INFO: <epoch:979, iter: 115,600, lr:5.000e-05> l_pix: 1.6978e-02 
+21-07-30 12:09:00.426 - INFO: <epoch:981, iter: 115,800, lr:5.000e-05> l_pix: 1.9428e-02 
+21-07-30 12:10:50.635 - INFO: <epoch:983, iter: 116,000, lr:5.000e-05> l_pix: 1.7361e-02 
+21-07-30 12:10:59.507 - INFO: # Validation # PSNR: 2.7603e+01
+21-07-30 12:10:59.508 - INFO: <epoch:983, iter: 116,000> psnr: 2.7603e+01
+21-07-30 12:10:59.508 - INFO: Saving models and training states.
+21-07-30 12:12:49.449 - INFO: <epoch:984, iter: 116,200, lr:5.000e-05> l_pix: 1.6970e-02 
+21-07-30 12:14:39.523 - INFO: <epoch:986, iter: 116,400, lr:5.000e-05> l_pix: 1.1418e-02 
+21-07-30 12:16:29.647 - INFO: <epoch:988, iter: 116,600, lr:5.000e-05> l_pix: 1.6849e-02 
+21-07-30 12:18:19.323 - INFO: <epoch:989, iter: 116,800, lr:5.000e-05> l_pix: 1.6224e-02 
+21-07-30 12:20:09.470 - INFO: <epoch:991, iter: 117,000, lr:5.000e-05> l_pix: 2.0186e-02 
+21-07-30 12:20:18.425 - INFO: # Validation # PSNR: 2.6696e+01
+21-07-30 12:20:18.425 - INFO: <epoch:991, iter: 117,000> psnr: 2.6696e+01
+21-07-30 12:20:18.426 - INFO: Saving models and training states.
+21-07-30 12:22:08.970 - INFO: <epoch:993, iter: 117,200, lr:5.000e-05> l_pix: 1.6359e-02 
+21-07-30 12:23:58.504 - INFO: <epoch:994, iter: 117,400, lr:5.000e-05> l_pix: 1.8684e-02 
+21-07-30 12:25:48.572 - INFO: <epoch:996, iter: 117,600, lr:5.000e-05> l_pix: 1.9809e-02 
+21-07-30 12:27:38.905 - INFO: <epoch:998, iter: 117,800, lr:5.000e-05> l_pix: 2.2416e-02 
+21-07-30 12:29:28.933 - INFO: <epoch:999, iter: 118,000, lr:5.000e-05> l_pix: 1.9911e-02 
+21-07-30 12:29:37.826 - INFO: # Validation # PSNR: 2.7595e+01
+21-07-30 12:29:37.827 - INFO: <epoch:999, iter: 118,000> psnr: 2.7595e+01
+21-07-30 12:29:37.827 - INFO: Saving models and training states.
+21-07-30 12:31:28.541 - INFO: <epoch:1001, iter: 118,200, lr:5.000e-05> l_pix: 2.3142e-02 
+21-07-30 12:33:18.746 - INFO: <epoch:1003, iter: 118,400, lr:5.000e-05> l_pix: 2.5928e-02 
+21-07-30 12:35:09.121 - INFO: <epoch:1005, iter: 118,600, lr:5.000e-05> l_pix: 2.2578e-02 
+21-07-30 12:36:58.957 - INFO: <epoch:1006, iter: 118,800, lr:5.000e-05> l_pix: 1.8907e-02 
+21-07-30 12:38:49.218 - INFO: <epoch:1008, iter: 119,000, lr:5.000e-05> l_pix: 1.4898e-02 
+21-07-30 12:38:58.148 - INFO: # Validation # PSNR: 2.6936e+01
+21-07-30 12:38:58.148 - INFO: <epoch:1008, iter: 119,000> psnr: 2.6936e+01
+21-07-30 12:38:58.149 - INFO: Saving models and training states.
+21-07-30 12:40:48.812 - INFO: <epoch:1010, iter: 119,200, lr:5.000e-05> l_pix: 1.9095e-02 
+21-07-30 12:42:38.748 - INFO: <epoch:1011, iter: 119,400, lr:5.000e-05> l_pix: 1.9845e-02 
+21-07-30 12:44:29.086 - INFO: <epoch:1013, iter: 119,600, lr:5.000e-05> l_pix: 1.7888e-02 
+21-07-30 12:46:19.561 - INFO: <epoch:1015, iter: 119,800, lr:5.000e-05> l_pix: 1.7347e-02 
+21-07-30 12:48:09.427 - INFO: <epoch:1016, iter: 120,000, lr:5.000e-05> l_pix: 1.5020e-02 
+21-07-30 12:48:18.323 - INFO: # Validation # PSNR: 2.7909e+01
+21-07-30 12:48:18.323 - INFO: <epoch:1016, iter: 120,000> psnr: 2.7909e+01
+21-07-30 12:48:18.323 - INFO: Saving models and training states.
+21-07-30 12:50:09.025 - INFO: <epoch:1018, iter: 120,200, lr:2.500e-05> l_pix: 1.6016e-02 
+21-07-30 12:51:59.449 - INFO: <epoch:1020, iter: 120,400, lr:2.500e-05> l_pix: 1.6358e-02 
+21-07-30 12:53:49.962 - INFO: <epoch:1022, iter: 120,600, lr:2.500e-05> l_pix: 1.6007e-02 
+21-07-30 12:55:39.975 - INFO: <epoch:1023, iter: 120,800, lr:2.500e-05> l_pix: 1.7309e-02 
+21-07-30 12:57:30.307 - INFO: <epoch:1025, iter: 121,000, lr:2.500e-05> l_pix: 1.5898e-02 
+21-07-30 12:57:39.226 - INFO: # Validation # PSNR: 2.7544e+01
+21-07-30 12:57:39.227 - INFO: <epoch:1025, iter: 121,000> psnr: 2.7544e+01
+21-07-30 12:57:39.227 - INFO: Saving models and training states.
+21-07-30 12:59:29.797 - INFO: <epoch:1027, iter: 121,200, lr:2.500e-05> l_pix: 1.6332e-02 
+21-07-30 13:01:19.655 - INFO: <epoch:1028, iter: 121,400, lr:2.500e-05> l_pix: 2.0564e-02 
+21-07-30 13:03:09.983 - INFO: <epoch:1030, iter: 121,600, lr:2.500e-05> l_pix: 1.6136e-02 
+21-07-30 13:05:00.306 - INFO: <epoch:1032, iter: 121,800, lr:2.500e-05> l_pix: 1.6430e-02 
+21-07-30 13:06:50.237 - INFO: <epoch:1033, iter: 122,000, lr:2.500e-05> l_pix: 1.4267e-02 
+21-07-30 13:06:59.148 - INFO: # Validation # PSNR: 2.7835e+01
+21-07-30 13:06:59.148 - INFO: <epoch:1033, iter: 122,000> psnr: 2.7835e+01
+21-07-30 13:06:59.149 - INFO: Saving models and training states.
+21-07-30 13:08:49.808 - INFO: <epoch:1035, iter: 122,200, lr:2.500e-05> l_pix: 1.3944e-02 
+21-07-30 13:10:40.143 - INFO: <epoch:1037, iter: 122,400, lr:2.500e-05> l_pix: 1.9132e-02 
+21-07-30 13:12:29.894 - INFO: <epoch:1038, iter: 122,600, lr:2.500e-05> l_pix: 1.7097e-02 
+21-07-30 13:14:20.132 - INFO: <epoch:1040, iter: 122,800, lr:2.500e-05> l_pix: 1.6144e-02 
+21-07-30 13:16:10.546 - INFO: <epoch:1042, iter: 123,000, lr:2.500e-05> l_pix: 2.2807e-02 
+21-07-30 13:16:19.440 - INFO: # Validation # PSNR: 2.7567e+01
+21-07-30 13:16:19.440 - INFO: <epoch:1042, iter: 123,000> psnr: 2.7567e+01
+21-07-30 13:16:19.441 - INFO: Saving models and training states.
+21-07-30 13:18:10.011 - INFO: <epoch:1044, iter: 123,200, lr:2.500e-05> l_pix: 1.6580e-02 
+21-07-30 13:19:59.883 - INFO: <epoch:1045, iter: 123,400, lr:2.500e-05> l_pix: 2.0491e-02 
+21-07-30 13:21:50.400 - INFO: <epoch:1047, iter: 123,600, lr:2.500e-05> l_pix: 1.6780e-02 
+21-07-30 13:23:40.976 - INFO: <epoch:1049, iter: 123,800, lr:2.500e-05> l_pix: 2.1533e-02 
+21-07-30 13:25:31.082 - INFO: <epoch:1050, iter: 124,000, lr:2.500e-05> l_pix: 1.7375e-02 
+21-07-30 13:25:40.035 - INFO: # Validation # PSNR: 2.7688e+01
+21-07-30 13:25:40.035 - INFO: <epoch:1050, iter: 124,000> psnr: 2.7688e+01
+21-07-30 13:25:40.036 - INFO: Saving models and training states.
+21-07-30 13:27:30.820 - INFO: <epoch:1052, iter: 124,200, lr:2.500e-05> l_pix: 1.4637e-02 
+21-07-30 13:29:21.180 - INFO: <epoch:1054, iter: 124,400, lr:2.500e-05> l_pix: 2.3201e-02 
+21-07-30 13:31:10.974 - INFO: <epoch:1055, iter: 124,600, lr:2.500e-05> l_pix: 1.7392e-02 
+21-07-30 13:33:01.238 - INFO: <epoch:1057, iter: 124,800, lr:2.500e-05> l_pix: 1.8162e-02 
+21-07-30 13:34:51.613 - INFO: <epoch:1059, iter: 125,000, lr:2.500e-05> l_pix: 1.9215e-02 
+21-07-30 13:35:00.481 - INFO: # Validation # PSNR: 2.7756e+01
+21-07-30 13:35:00.481 - INFO: <epoch:1059, iter: 125,000> psnr: 2.7756e+01
+21-07-30 13:35:00.481 - INFO: Saving models and training states.
+21-07-30 13:36:51.097 - INFO: <epoch:1061, iter: 125,200, lr:2.500e-05> l_pix: 2.1887e-02 
+21-07-30 13:38:40.961 - INFO: <epoch:1062, iter: 125,400, lr:2.500e-05> l_pix: 2.0399e-02 
+21-07-30 13:40:31.373 - INFO: <epoch:1064, iter: 125,600, lr:2.500e-05> l_pix: 2.1664e-02 
+21-07-30 13:42:21.892 - INFO: <epoch:1066, iter: 125,800, lr:2.500e-05> l_pix: 2.2318e-02 
+21-07-30 13:44:11.757 - INFO: <epoch:1067, iter: 126,000, lr:2.500e-05> l_pix: 1.8336e-02 
+21-07-30 13:44:20.647 - INFO: # Validation # PSNR: 2.7556e+01
+21-07-30 13:44:20.648 - INFO: <epoch:1067, iter: 126,000> psnr: 2.7556e+01
+21-07-30 13:44:20.648 - INFO: Saving models and training states.
+21-07-30 13:46:11.599 - INFO: <epoch:1069, iter: 126,200, lr:2.500e-05> l_pix: 1.7278e-02 
+21-07-30 13:48:02.198 - INFO: <epoch:1071, iter: 126,400, lr:2.500e-05> l_pix: 2.1249e-02 
+21-07-30 13:49:52.383 - INFO: <epoch:1072, iter: 126,600, lr:2.500e-05> l_pix: 1.8404e-02 
+21-07-30 13:51:42.874 - INFO: <epoch:1074, iter: 126,800, lr:2.500e-05> l_pix: 1.4582e-02 
+21-07-30 13:53:33.250 - INFO: <epoch:1076, iter: 127,000, lr:2.500e-05> l_pix: 1.9702e-02 
+21-07-30 13:53:42.103 - INFO: # Validation # PSNR: 2.7352e+01
+21-07-30 13:53:42.103 - INFO: <epoch:1076, iter: 127,000> psnr: 2.7352e+01
+21-07-30 13:53:42.104 - INFO: Saving models and training states.
+21-07-30 13:55:32.348 - INFO: <epoch:1077, iter: 127,200, lr:2.500e-05> l_pix: 1.5089e-02 
+21-07-30 13:57:23.003 - INFO: <epoch:1079, iter: 127,400, lr:2.500e-05> l_pix: 1.5141e-02 
+21-07-30 13:59:14.327 - INFO: <epoch:1081, iter: 127,600, lr:2.500e-05> l_pix: 1.3843e-02 
+21-07-30 14:01:04.846 - INFO: <epoch:1083, iter: 127,800, lr:2.500e-05> l_pix: 1.7065e-02 
+21-07-30 14:02:54.816 - INFO: <epoch:1084, iter: 128,000, lr:2.500e-05> l_pix: 1.5759e-02 
+21-07-30 14:03:03.738 - INFO: # Validation # PSNR: 2.7854e+01
+21-07-30 14:03:03.738 - INFO: <epoch:1084, iter: 128,000> psnr: 2.7854e+01
+21-07-30 14:03:03.739 - INFO: Saving models and training states.
+21-07-30 14:04:54.719 - INFO: <epoch:1086, iter: 128,200, lr:2.500e-05> l_pix: 2.4247e-02 
+21-07-30 14:06:45.185 - INFO: <epoch:1088, iter: 128,400, lr:2.500e-05> l_pix: 1.5360e-02 
+21-07-30 14:08:35.325 - INFO: <epoch:1089, iter: 128,600, lr:2.500e-05> l_pix: 1.5576e-02 
+21-07-30 14:10:25.721 - INFO: <epoch:1091, iter: 128,800, lr:2.500e-05> l_pix: 2.2327e-02 
+21-07-30 14:12:16.230 - INFO: <epoch:1093, iter: 129,000, lr:2.500e-05> l_pix: 1.9438e-02 
+21-07-30 14:12:25.122 - INFO: # Validation # PSNR: 2.8035e+01
+21-07-30 14:12:25.122 - INFO: <epoch:1093, iter: 129,000> psnr: 2.8035e+01
+21-07-30 14:12:25.122 - INFO: Saving models and training states.
+21-07-30 14:14:15.945 - INFO: <epoch:1094, iter: 129,200, lr:2.500e-05> l_pix: 1.6382e-02 
+21-07-30 14:16:06.497 - INFO: <epoch:1096, iter: 129,400, lr:2.500e-05> l_pix: 1.8265e-02 
+21-07-30 14:17:56.749 - INFO: <epoch:1098, iter: 129,600, lr:2.500e-05> l_pix: 3.0165e-02 
+21-07-30 14:19:46.967 - INFO: <epoch:1099, iter: 129,800, lr:2.500e-05> l_pix: 1.5262e-02 
+21-07-30 14:21:37.702 - INFO: <epoch:1101, iter: 130,000, lr:2.500e-05> l_pix: 1.6776e-02 
+21-07-30 14:21:46.688 - INFO: # Validation # PSNR: 2.8083e+01
+21-07-30 14:21:46.689 - INFO: <epoch:1101, iter: 130,000> psnr: 2.8083e+01
+21-07-30 14:21:46.689 - INFO: Saving models and training states.
+21-07-30 14:23:37.263 - INFO: <epoch:1103, iter: 130,200, lr:2.500e-05> l_pix: 1.3926e-02 
+21-07-30 14:25:27.645 - INFO: <epoch:1105, iter: 130,400, lr:2.500e-05> l_pix: 2.7908e-02 
+21-07-30 14:27:17.625 - INFO: <epoch:1106, iter: 130,600, lr:2.500e-05> l_pix: 1.7565e-02 
+21-07-30 14:29:08.164 - INFO: <epoch:1108, iter: 130,800, lr:2.500e-05> l_pix: 2.0963e-02 
+21-07-30 14:30:58.511 - INFO: <epoch:1110, iter: 131,000, lr:2.500e-05> l_pix: 2.0091e-02 
+21-07-30 14:31:07.433 - INFO: # Validation # PSNR: 2.7931e+01
+21-07-30 14:31:07.434 - INFO: <epoch:1110, iter: 131,000> psnr: 2.7931e+01
+21-07-30 14:31:07.434 - INFO: Saving models and training states.
+21-07-30 14:32:57.796 - INFO: <epoch:1111, iter: 131,200, lr:2.500e-05> l_pix: 2.2475e-02 
+21-07-30 14:34:48.479 - INFO: <epoch:1113, iter: 131,400, lr:2.500e-05> l_pix: 1.6247e-02 
+21-07-30 14:36:38.986 - INFO: <epoch:1115, iter: 131,600, lr:2.500e-05> l_pix: 2.2106e-02 
+21-07-30 14:38:29.027 - INFO: <epoch:1116, iter: 131,800, lr:2.500e-05> l_pix: 1.7904e-02 
+21-07-30 14:40:19.382 - INFO: <epoch:1118, iter: 132,000, lr:2.500e-05> l_pix: 2.8332e-02 
+21-07-30 14:40:28.287 - INFO: # Validation # PSNR: 2.8272e+01
+21-07-30 14:40:28.287 - INFO: <epoch:1118, iter: 132,000> psnr: 2.8272e+01
+21-07-30 14:40:28.288 - INFO: Saving models and training states.
+21-07-30 14:42:18.915 - INFO: <epoch:1120, iter: 132,200, lr:2.500e-05> l_pix: 1.8236e-02 
+21-07-30 14:44:09.459 - INFO: <epoch:1122, iter: 132,400, lr:2.500e-05> l_pix: 1.6733e-02 
+21-07-30 14:45:59.496 - INFO: <epoch:1123, iter: 132,600, lr:2.500e-05> l_pix: 1.6634e-02 
+21-07-30 14:47:49.951 - INFO: <epoch:1125, iter: 132,800, lr:2.500e-05> l_pix: 1.9612e-02 
+21-07-30 14:49:40.198 - INFO: <epoch:1127, iter: 133,000, lr:2.500e-05> l_pix: 1.8533e-02 
+21-07-30 14:49:49.090 - INFO: # Validation # PSNR: 2.7775e+01
+21-07-30 14:49:49.090 - INFO: <epoch:1127, iter: 133,000> psnr: 2.7775e+01
+21-07-30 14:49:49.091 - INFO: Saving models and training states.
+21-07-30 14:51:39.500 - INFO: <epoch:1128, iter: 133,200, lr:2.500e-05> l_pix: 1.5976e-02 
+21-07-30 14:53:29.881 - INFO: <epoch:1130, iter: 133,400, lr:2.500e-05> l_pix: 1.5963e-02 
+21-07-30 14:55:20.285 - INFO: <epoch:1132, iter: 133,600, lr:2.500e-05> l_pix: 1.5874e-02 
+21-07-30 14:57:10.163 - INFO: <epoch:1133, iter: 133,800, lr:2.500e-05> l_pix: 1.4656e-02 
+21-07-30 14:59:00.399 - INFO: <epoch:1135, iter: 134,000, lr:2.500e-05> l_pix: 1.9382e-02 
+21-07-30 14:59:09.269 - INFO: # Validation # PSNR: 2.7825e+01
+21-07-30 14:59:09.270 - INFO: <epoch:1135, iter: 134,000> psnr: 2.7825e+01
+21-07-30 14:59:09.270 - INFO: Saving models and training states.
+21-07-30 15:01:00.319 - INFO: <epoch:1137, iter: 134,200, lr:2.500e-05> l_pix: 2.0410e-02 
+21-07-30 15:02:50.667 - INFO: <epoch:1138, iter: 134,400, lr:2.500e-05> l_pix: 2.0699e-02 
+21-07-30 15:04:41.149 - INFO: <epoch:1140, iter: 134,600, lr:2.500e-05> l_pix: 2.5993e-02 
+21-07-30 15:06:31.908 - INFO: <epoch:1142, iter: 134,800, lr:2.500e-05> l_pix: 1.5020e-02 
+21-07-30 15:08:22.656 - INFO: <epoch:1144, iter: 135,000, lr:2.500e-05> l_pix: 1.9126e-02 
+21-07-30 15:08:31.615 - INFO: # Validation # PSNR: 2.7672e+01
+21-07-30 15:08:31.615 - INFO: <epoch:1144, iter: 135,000> psnr: 2.7672e+01
+21-07-30 15:08:31.615 - INFO: Saving models and training states.
+21-07-30 15:10:22.126 - INFO: <epoch:1145, iter: 135,200, lr:2.500e-05> l_pix: 1.3729e-02 
+21-07-30 15:12:12.735 - INFO: <epoch:1147, iter: 135,400, lr:2.500e-05> l_pix: 1.6843e-02 
+21-07-30 15:14:03.418 - INFO: <epoch:1149, iter: 135,600, lr:2.500e-05> l_pix: 1.6509e-02 
+21-07-30 15:15:53.968 - INFO: <epoch:1150, iter: 135,800, lr:2.500e-05> l_pix: 1.9687e-02 
+21-07-30 15:17:44.893 - INFO: <epoch:1152, iter: 136,000, lr:2.500e-05> l_pix: 1.7154e-02 
+21-07-30 15:17:53.834 - INFO: # Validation # PSNR: 2.8148e+01
+21-07-30 15:17:53.834 - INFO: <epoch:1152, iter: 136,000> psnr: 2.8148e+01
+21-07-30 15:17:53.835 - INFO: Saving models and training states.
+21-07-30 15:19:45.537 - INFO: <epoch:1154, iter: 136,200, lr:2.500e-05> l_pix: 1.6377e-02 
+21-07-30 15:21:40.165 - INFO: <epoch:1155, iter: 136,400, lr:2.500e-05> l_pix: 2.2525e-02 
+21-07-30 15:23:37.225 - INFO: <epoch:1157, iter: 136,600, lr:2.500e-05> l_pix: 2.0552e-02 
+21-07-30 15:26:16.092 - INFO: <epoch:1159, iter: 136,800, lr:2.500e-05> l_pix: 1.9396e-02 
+21-07-30 15:28:06.421 - INFO: <epoch:1161, iter: 137,000, lr:2.500e-05> l_pix: 1.7669e-02 
+21-07-30 15:28:15.352 - INFO: # Validation # PSNR: 2.6965e+01
+21-07-30 15:28:15.352 - INFO: <epoch:1161, iter: 137,000> psnr: 2.6965e+01
+21-07-30 15:28:15.353 - INFO: Saving models and training states.
+21-07-30 15:30:06.792 - INFO: <epoch:1162, iter: 137,200, lr:2.500e-05> l_pix: 1.7794e-02 
+21-07-30 15:31:59.813 - INFO: <epoch:1164, iter: 137,400, lr:2.500e-05> l_pix: 1.2401e-02 
+21-07-30 15:33:51.491 - INFO: <epoch:1166, iter: 137,600, lr:2.500e-05> l_pix: 2.3836e-02 
+21-07-30 15:35:41.767 - INFO: <epoch:1167, iter: 137,800, lr:2.500e-05> l_pix: 1.5715e-02 
+21-07-30 15:37:32.373 - INFO: <epoch:1169, iter: 138,000, lr:2.500e-05> l_pix: 2.3541e-02 
+21-07-30 15:37:41.262 - INFO: # Validation # PSNR: 2.8109e+01
+21-07-30 15:37:41.262 - INFO: <epoch:1169, iter: 138,000> psnr: 2.8109e+01
+21-07-30 15:37:41.262 - INFO: Saving models and training states.
+21-07-30 15:39:32.308 - INFO: <epoch:1171, iter: 138,200, lr:2.500e-05> l_pix: 1.7649e-02 
+21-07-30 15:41:22.545 - INFO: <epoch:1172, iter: 138,400, lr:2.500e-05> l_pix: 1.9334e-02 
+21-07-30 15:43:13.631 - INFO: <epoch:1174, iter: 138,600, lr:2.500e-05> l_pix: 1.5421e-02 
+21-07-30 15:45:04.262 - INFO: <epoch:1176, iter: 138,800, lr:2.500e-05> l_pix: 1.9125e-02 
+21-07-30 15:46:54.410 - INFO: <epoch:1177, iter: 139,000, lr:2.500e-05> l_pix: 1.9532e-02 
+21-07-30 15:47:03.336 - INFO: # Validation # PSNR: 2.8015e+01
+21-07-30 15:47:03.336 - INFO: <epoch:1177, iter: 139,000> psnr: 2.8015e+01
+21-07-30 15:47:03.337 - INFO: Saving models and training states.
+21-07-30 15:48:54.852 - INFO: <epoch:1179, iter: 139,200, lr:2.500e-05> l_pix: 1.5439e-02 
